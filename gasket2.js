@@ -3,7 +3,7 @@
 var gl;
 var points;
 
-var NumPoints = 60000;
+var NumPoints = 1000000;
 
 function getWeightedRandom(weights, values) {
     let rollingWeights = [weights[0]]
