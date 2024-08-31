@@ -8,7 +8,7 @@ var canvas;
 var gl;
 var slider = document.getElementById("slider");
 var label = document.getElementById("sliderLabel")
-console.log(slider);
+// numCirclePoints er fjöldi punkta á hringnum
 var numCirclePoints = 50;
 
 function sliderChange() {
@@ -18,7 +18,6 @@ function sliderChange() {
     console.log(slider.value)
 }    
 
-// numCirclePoints er fjöldi punkta á hringnum
 // Heildarfjöldi punkta er tveimur meiri (miðpunktur + fyrsti punktur kemur tvisvar)       
 
 var radius = 0.5;

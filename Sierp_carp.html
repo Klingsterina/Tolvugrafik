@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+<title>2D Sierpinski Gasket</title>
 
 
 <script id="vertex-shader" type="x-shader/x-vertex">
-
 attribute vec4 vPosition;
 
 void
@@ -14,7 +16,6 @@ main()
 </script>
 
 <script id="fragment-shader" type="x-shader/x-fragment">
-
 precision mediump float;
 
 void
@@ -27,17 +28,12 @@ main()
 <script type="text/javascript" src="../Common/webgl-utils.js"></script>
 <script type="text/javascript" src="../Common/initShaders.js"></script>
 <script type="text/javascript" src="../Common/MV.js"></script>
-<script type="text/javascript" defer src="circlefan.js"></script>
+<script type="text/javascript" src="Sierp_carp.js"></script>
+</head>   
 
 <body>
     <a href="index.html">Til baka</a>
     <br>
-    <label id="sliderLabel" for="slider">Fjöldi punkta</label>
-    <br>
-    <input id="slider" type="range" value="10"  oninput="sliderChange()" min="3" max="50">
-    <br>
-<canvas id="gl-canvas" width="512" height="512">>
-Oops ... your browser doesn't support the HTML5 canvas element
-</canvas>
+<canvas class="verkefni" id="gl-canvas" width="1024" height="1024"></canvas>
 </body>
 </html>
