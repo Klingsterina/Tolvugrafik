@@ -1,0 +1,63 @@
+* {
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+}
+
+h1, h3 {
+    margin: 1rem;
+}
+
+h4, a {
+    font-size: larger;
+    font-weight: 700px;
+    margin: 5px;
+    color: rgb(223, 216, 216);
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Responsive columns */
+    align-items: stretch;
+    gap: 1rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+.card {
+    display: flex;
+    background-color: rgba(105, 173, 173, 0.368);
+    flex-direction: column;
+    padding: 1rem;
+    border: 3px solid transparent;
+    width: 80%;
+    border-radius: 8px;
+}
+
+.card a {
+    align-self: center;
+    text-align: center;
+}
+
+/* zig zag border */
+.zig-zag {
+    border: none;
+    background: linear-gradient(135deg,#1f005c, #5b0060, #870160, #ac255e, #ca485c, #e16b5c, #f39060, #ffb56b);
+    mask: 
+        conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 10px 100% repeat-x,
+        conic-gradient(from -45deg at top, #0000, #000 1deg 89deg, #0000 90deg) 50% / 10px 100% repeat-x;
+    
+    /* Webkit-specific mask property for compatibility */
+    -webkit-mask:
+        conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 10px 100% repeat-x,
+        conic-gradient(from -45deg at top, #0000, #000 1deg 89deg, #0000 90deg) 50% / 10px 100% repeat-x;
+    
+    /* Fallback mask properties */
+    -moz-mask: 
+        conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 10px 100% repeat-x,
+        conic-gradient(from -45deg at top, #0000, #000 1deg 89deg, #0000 90deg) 50% / 10px 100% repeat-x;
+
+    -o-mask: 
+        conic-gradient(from -45deg at bottom, #0000, #000 1deg 89deg, #0000 90deg) 50% / 10px 100% repeat-x,
+        conic-gradient(from -45deg at top, #0000, #000 1deg 89deg, #0000 90deg) 50% / 10px 100% repeat-x;
+}
