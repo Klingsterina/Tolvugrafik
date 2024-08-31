@@ -3,7 +3,7 @@
 var canvas;
 var gl;
 var points = [];
-var NumTimesToSubdivide = 3;
+var NumTimesToSubdivide = 6;
 let maxNumPoints = 20000
 let index = 0;
 
