@@ -4,6 +4,10 @@
     text-decoration: none;
 }
 
+html {
+    background-color: #ffcf9e;
+}
+
 h1, h3 {
     margin: 1rem;
 }
