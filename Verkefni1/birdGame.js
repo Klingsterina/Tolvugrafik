@@ -5,23 +5,14 @@ var mouseX;               // Old value of x-coordinate
 var movement = false;     // Do we move the paddle?
 var mouseBufferId;        // Buffer fyrir byssuna
 var birdBufferId;         // Buffer fyrir fuglana
-let skotBufferId;         // Buffer fyrir skot
+var skotBufferId;         // Buffer fyrir skot
 var vPosition;
-var speed;
+var speed = Math.random();
 
-// Fylki af fuglum með staðsetningu og hraða
-let birds = [];
-let numBirds = Math.floor(Math.random() * 10) + 1; // Velur fjölda fugla á bilinu 1 til 10
-for (let i = 0; i < numBirds; i++) {
-    birds.push({
-        x: Math.random() * 2 - 1,  // Velur x á bilinu -1 til 1
-        y: Math.random() * 0.8,    // Velur y á bilinu 0 til 0.8
-        speed: Math.random() * 0.03 + 0.01  // Velur hraða á bilinu 0.01 til 0.04
-    });
-}
-var birdVertices = new Float32Array(numBirds * 8); // 4 vertices með 2 components fyrir hvern fugl
-
-let skot = [];
+var skot = [];
+var birds = [];
+var numBirds = Math.floor(Math.random() * 15) + 5; // Velur fjölda fugla á bilinu 5 til 15
+var maxBirds = 10;
 
 window.onload = function init() {
     canvas = document.getElementById("gl-canvas");
@@ -36,18 +27,11 @@ window.onload = function init() {
     var program = initShaders(gl, "vertex-shader", "fragment-shader");
     gl.useProgram(program);
 
-    // Hnit fyrir byssuna (óbreyttur kóði)
+    // Hnit fyrir byssuna
     var mouseVertices = [
         vec2(-0.1, -0.9),  // Bottom left
         vec2(0.0, -0.7),   // Top center
         vec2(0.1, -0.9)    // Bottom right 
-    ];
-
-    let skotVertices = [
-        vec2(-0.1, -0.9),
-        vec2(-0.1, -0.3),
-        vec2(0.0, -0.3),
-        vec2(0.1, -0.9)
     ];
 
     // Initialize empty bird vertices for the buffer
@@ -95,99 +79,163 @@ window.onload = function init() {
         }
     });
 
-
     // búa til keyevent fyrir bilstöngina
     window.addEventListener("keydown", function (e) {
         if (e.code == "Space") {
-            skot.push({
-                x: mouseVertices[1][0], // Byggir á miðpunkti byssunnar
-                y: -0.7,               // Byrjar rétt fyrir ofan byssuna
-                speed: 0.02            // Hraði skotsins
-            });
+            if (skot.length < 3) {
+                skot.push({
+                    x: mouseVertices[1][0], // Byggir á miðpunkti byssunnar
+                    y: -0.7,               // Byrjar rétt fyrir ofan byssuna
+                    speed: 0.02            // Hraði skotsins
+                });
+            }
         }
     })
 
+    birds = generateBirds(numBirds);
     render();
 };
 
 //VERKEFNI
 //DONE
 // Fleiri en einn fugl er á flugi á sama tíma og þeir eru á mismunandi hraða og í
-// mismunandi hæð.
-
-//OPTIONAL
-// • Hægt er að vera með meira en eitt skot (t.d. 3-5) í gangi á sama tíma (þ.e. hægt að
-// skjóta nýju skoti þó annað skot sé þegar í loftinu).
-// • Halda utanum skotna fugla með því að setja "strik" efst í gluggann. Þegar komin eru 5
-// strik þá er leiknum lokið
-
-//TODO
+// mismunandi hæð
 
 //búa til hnit fyrir skotin
 //búa til buttonevent fyrir skotin
 // spilari ítir á bil til að skjóta
 
+// • Hægt er að vera með meira en eitt skot (t.d. 3-5) í gangi á sama tíma (þ.e. hægt að
+// skjóta nýju skoti þó annað skot sé þegar í loftinu).
+
+
+//OPTIONAL / IN PROGRESS
+// • Halda utanum skotna fugla með því að setja "strik" efst í gluggann. Þegar komin eru 5
+// strik þá er leiknum lokið
+
+//TODO
 
 //búa til collision á fuglunum og skotinu
 //þegar skot hittir fugl þá hverfur fuglinn
 //láta nýjan fugl byrtast eftir ákveðinn tíma
 
 
+function generateBirds(count) {
+    let newBirds = [];
+    for (let i = 0; i < count; i++) {
+        newBirds.push({
+            x: Math.random() * 2 - 1,  // x-staðsetning á bilinu -1 til 1
+            y: Math.random() * 0.8 + 0.1, // y-staðsetning á bilinu 0.1 til 0.9 (ofar á skjánum)
+            speed: (Math.random() * 0.02 + 0.01) * (Math.random() > 0.3 ? 1 : -1) // hraði, þar sem sumir fara til vinstri
+        });
+    }
+    return newBirds;
+}
 
-function render() {
-    gl.clear(gl.COLOR_BUFFER_BIT);
+function checkForCollisions() {
+    skot.forEach((shot, shotIndex) => {
+        birds.forEach((bird, birdIndex) => {
+            // Skilgreina mörk fyrir skot og fugl
+            let shotLeft = shot.x - 0.01;
+            let shotRight = shot.x + 0.01;
+            let shotBottom = shot.y;
+            let shotTop = shot.y + 0.1;
 
-    // Teikna byssuna (óbreyttur kóði)
-    gl.bindBuffer(gl.ARRAY_BUFFER, mouseBufferId);
-    gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
-    gl.drawArrays(gl.TRIANGLES, 0, 3);
+            let birdLeft = bird.x - 0.03;
+            let birdRight = bird.x + 0.03;
+            let birdBottom = bird.y - 0.01;
+            let birdTop = bird.y + 0.04;
 
-    // Uppfæra fuglana
+            // tékkar á árekstri, athugar hvort mörkin skarast
+            if (
+                shotRight > birdLeft &&
+                shotLeft < birdRight &&
+                shotTop > birdBottom &&
+                shotBottom < birdTop
+            ) {
+                // Fjarlægjir fugl og skot ef árekstur á sér stað
+                skot.splice(shotIndex, 1);
+                birds.splice(birdIndex, 1);
+
+                // Bæta nýjum fugli við ef það eru færri en hámarki fugla
+                if (birds.length < maxBirds) {
+                    birds.push(...generateBirds(1)); // Bætir einum nýjum fugli við
+                    console.log("new birdy")
+                }
+            }
+        });
+    });
+}
+
+// Teiknar fuglana
+function drawBird() {
     birds.forEach((bird, index) => {
         bird.x += bird.speed;
+        
+        // Fer yfir á hina hliðina þegar fugl fer út fyrir canvas
         if (bird.x > 1.1) bird.x = -1.1;
+        if (bird.x < -1.1) bird.x = 1.1;
 
         // Hnit fyrir hvern fugl miðað við staðsetningu hans
         var birdVertices = [
-            vec2(bird.x - 0.05, bird.y - 0.05),   // Bottom left
-            vec2(bird.x - 0.05, bird.y + 0.05),  // Top left
-            vec2(bird.x + 0.05, bird.y + 0.05),  // Top right
-            vec2(bird.x + 0.05, bird.y - 0.05)    // Bottom right
+            vec2(bird.x - 0.03, bird.y - 0.01),   // Bottom left
+            vec2(bird.x - 0.03, bird.y + 0.04),  // Top left
+            vec2(bird.x + 0.03, bird.y + 0.04),  // Top right
+            vec2(bird.x + 0.03, bird.y - 0.01)    // Bottom right
         ];
 
         // Uppfæra fuglahnitin í buffer
         gl.bindBuffer(gl.ARRAY_BUFFER, birdBufferId);
         gl.bufferSubData(gl.ARRAY_BUFFER, index * 8 * Float32Array.BYTES_PER_ELEMENT, flatten(birdVertices));
-
-        // Teikna fuglinn
-        gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
-        for (let i = 0; i < numBirds; i++) {
-            gl.drawArrays(gl.TRIANGLE_FAN, i * 4, 4); // Draw each bird
-        }    
     });
 
+    // Teikna alla fugla eftir að búið er að uppfæra bufferinn
+    gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
+    for (let i = 0; i < birds.length; i++) {
+        gl.drawArrays(gl.TRIANGLE_FAN, i * 4, 4); // Teikna hvern fugl
+    }
+}
+
+function drawGun() {
+    // Teikna byssuna (óbreyttur kóði)
+    gl.bindBuffer(gl.ARRAY_BUFFER, mouseBufferId);
+    gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+}
+
+function drawShots() {
     // Uppfærir og teiknar skotin
     skot.forEach((shot, index) => {
         shot.y += shot.speed;
-
         // Fjarlægir skot ef það fer út fyrir skjáinn
         if (shot.y > 1.0) {
             skot.splice(index, 1);
             return;
         }
-
         var skotVertices = [
-            vec2(shot.x - 0.02, shot.y),
-            vec2(shot.x - 0.02, shot.y + 0.1),
-            vec2(shot.x + 0.02, shot.y + 0.1),
-            vec2(shot.x + 0.02, shot.y)
+            vec2(shot.x - 0.01, shot.y ),
+            vec2(shot.x - 0.01, shot.y + 0.1),
+            vec2(shot.x + 0.01, shot.y + 0.1),
+            vec2(shot.x + 0.01, shot.y)
         ];
 
         gl.bindBuffer(gl.ARRAY_BUFFER, skotBufferId);
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(skotVertices));
         gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
         gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
+        console.log("pew pew")
     });
+}
+
+function render() {
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    drawGun();
+    drawBird();
+    drawShots();
+    checkForCollisions();
     
-    window.requestAnimationFrame(render);
+    setTimeout(function () {
+        requestAnimationFrame(render);
+    }, speed);
 }

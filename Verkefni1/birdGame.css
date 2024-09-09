@@ -1,0 +1,42 @@
+html, body {
+    margin: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+}
+
+.canvas-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#gl-canvas {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    border: 1px solid #000;  /* Valfrjálst, til að sýna strigann betur */
+}
+
+.scoreBoard {
+    text-align: center;
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f4f4f4;
+}
+
+a {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    text-decoration: none;
+    color: blue;
+    font-size: 18px;
+}
+

@@ -32,10 +32,17 @@ main()
 <script type="text/javascript" src="../Common/initShaders.js"></script>
 <script type="text/javascript" src="../Common/MV.js"></script>
 <script type="text/javascript" src="birdGame.js"></script>
+<link rel="stylesheet" href="birdGame.css">
 
 <body>
     <a href="../index.html">Til baka</a>
     <br>
-<canvas id="gl-canvas" width="1000" height="600">
+    <div class="canvas-container">
+        <canvas class="canvas" id="gl-canvas" width="1500" height="1000"></canvas>
+    </div>
+    <div class="scoreBoard">
+        <h3>Stigatafla</h3>
+        <p id="score">Stig: 0</p>
+    </div>
 </body>
 </html>
