@@ -14,7 +14,7 @@ let stig = "";
 let fuglar = 0;
 var skot = [];
 var birds = [];
-var numBirds = 5;
+var numBirds = 1;
 var maxBirds = 10;
 
 window.onload = function init() {
@@ -24,7 +24,7 @@ window.onload = function init() {
     if (!gl) { alert("WebGL isn't available"); }
 
     gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(0.8, 0.8, 0.8, 1.0);
+    gl.clearColor(0.6, 0.6, 0.8, 1.0);
 
     // Load shaders and initialize attribute buffers
     var program = initShaders(gl, "vertex-shader", "fragment-shader");
@@ -100,24 +100,6 @@ window.onload = function init() {
     render();
 };
 
-//VERKEFNI
-//DONE
-// Fleiri en einn fugl er á flugi á sama tíma og þeir eru á mismunandi hraða og í
-// mismunandi hæð
-
-//búa til hnit fyrir skotin
-//búa til buttonevent fyrir skotin
-// spilari ítir á bil til að skjóta
-
-// • Hægt er að vera með meira en eitt skot (t.d. 3-5) í gangi á sama tíma (þ.e. hægt að
-// skjóta nýju skoti þó annað skot sé þegar í loftinu).
-
-//búa til collision á fuglunum og skotinu
-//þegar skot hittir fugl þá hverfur fuglinn
-
-// • Halda utanum skotna fugla með því að setja "strik" efst í gluggann. Þegar komin eru 5
-// strik þá er leiknum lokið
-
 
 function generateBirds(count) {
     let newBirds = [];
@@ -180,21 +162,32 @@ function endGame() {
     cancelAnimationFrame(renderId);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    const message = "Leik lokið! Þú hefur skotið 5 fugla.";
+    const canvas = document.getElementById("gl-canvas");
+    canvas.style.position = 'relative'
+
+    const message = `Leik lokið! \n Þú hefur skotið ${numBirds} fugla.`;
     console.log(message);
 
     // Búa til HTML element fyrir skilaboð
-    const endMessageElement = document.createElement('div');
-    endMessageElement.style.position = 'absolute';
-    endMessageElement.style.top = '50%';
-    endMessageElement.style.left = '50%';
-    endMessageElement.style.transform = 'translate(-50%, -50%)';
-    endMessageElement.style.fontSize = '50px';
-    endMessageElement.style.color = 'black';
-    endMessageElement.innerText = message;
-    document.body.appendChild(endMessageElement);
+    const leikLokið = document.createElement('div');
+    leikLokið.className = 'leikLokið';
+    leikLokið.innerText = message;
+    document.body.appendChild(leikLokið);
+
+    const newGame = "Nýr leikur";
+    const button = document.createElement('button');
+    button.className = 'newGame';
+    button.innerText = newGame;
+    document.body.appendChild(button);
+
+    button.addEventListener('click', function() {
+        startGame()
+    })
 }
 
+function startGame() {
+    location.reload();
+}
 
 // Teiknar fuglana
 function drawBird() {
@@ -226,6 +219,7 @@ function drawBird() {
     }
 }
 
+//Teiknar byssuna
 function drawGun() {
     // Teikna byssuna (óbreyttur kóði)
     gl.bindBuffer(gl.ARRAY_BUFFER, mouseBufferId);
@@ -233,6 +227,7 @@ function drawGun() {
     gl.drawArrays(gl.TRIANGLES, 0, 3);
 }
 
+// Teiknar skotin
 function drawShots() {
     // Uppfærir og teiknar skotin
     for (let i = 0; i < skot.length; i++) {
@@ -259,6 +254,7 @@ function drawShots() {
     };
 }
 
+// Aðal Animation fallið
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT);
 
@@ -273,11 +269,30 @@ function render() {
 }
 
 
+//VERKEFNI og Geymdur kóði
+//DONE
+// Fleiri en einn fugl er á flugi á sama tíma og þeir eru á mismunandi hraða og í
+// mismunandi hæð
+
+//búa til hnit fyrir skotin
+//búa til buttonevent fyrir skotin
+// spilari ítir á bil til að skjóta
+
+// • Hægt er að vera með meira en eitt skot (t.d. 3-5) í gangi á sama tíma (þ.e. hægt að
+// skjóta nýju skoti þó annað skot sé þegar í loftinu).
+
+//búa til collision á fuglunum og skotinu
+//þegar skot hittir fugl þá hverfur fuglinn
+
+// • Halda utanum skotna fugla með því að setja "strik" efst í gluggann. Þegar komin eru 5
+// strik þá er leiknum lokið
+
+
 //GEYMA KÓÐA
-    // // Bæta nýjum fugli við ef það eru færri en hámarki fugla
-    // if (birds.length < maxBirds) {
-    //     birds.push(...generateBirds(1)); // Bætir einum nýjum fugli við
-    //     console.log("new birdy");
-    // }
-    
-    // Math.floor(Math.random() * 15) + 5; // Velur fjölda fugla á bilinu 5 til 15
+// // Bæta nýjum fugli við ef það eru færri en hámarki fugla
+// if (birds.length < maxBirds) {
+//     birds.push(...generateBirds(1)); // Bætir einum nýjum fugli við
+//     console.log("new birdy");
+// }
+
+// Math.floor(Math.random() * 15) + 5; // Velur fjölda fugla á bilinu 5 til 15

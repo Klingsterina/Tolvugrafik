@@ -7,25 +7,23 @@ html, body {
     justify-content: center;
     overflow: hidden;
     font-family: Arial, sans-serif;
+    background-color: #ffcf9e;
 }
 
 .canvas-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    border: 5px solid black;
+    border: 10px solid #5d14bd;
     border-radius: 8px;
 }
-canvas {
-    border: 10px solid rgb(0, 0, 0);
-    border-radius: 5px;
-}
+
 
 #gl-canvas {
     display: block;
     max-width: 100%;
     max-height: 100%;
-    border: 1px solid #000;  /* Valfrjálst, til að sýna strigann betur */
+    border: 5px solid #9b57f5;  /* Valfrjálst, til að sýna strigann betur */
 }
 
 #stig {
@@ -34,22 +32,40 @@ canvas {
 
 .scoreBoard {
     text-align: center;
-    margin-top: 10px;
+    margin: 1rem 0 1rem 1rem 1rem;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 8px;
     background-color: #f4f4f4;
-    width: 1500px;
+    width: 700px;
     font-weight: bolder;
     font-size: x-large;
 }
 
-a {
+/* a {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 50px;
+    left: 50px;
     text-decoration: none;
     color: blue;
     font-size: 18px;
+} */
+
+.leikLokið {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 50px;
 }
 
+.newGame {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 20px;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: white;
+}
