@@ -13,6 +13,12 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
+    border: 5px solid black;
+    border-radius: 8px;
+}
+canvas {
+    border: 10px solid rgb(0, 0, 0);
+    border-radius: 5px;
 }
 
 #gl-canvas {
@@ -22,6 +28,10 @@ html, body {
     border: 1px solid #000;  /* Valfrjálst, til að sýna strigann betur */
 }
 
+#stig {
+    margin-bottom: 1rem;
+}
+
 .scoreBoard {
     text-align: center;
     margin-top: 10px;
@@ -29,6 +39,9 @@ html, body {
     border: 1px solid #ddd;
     border-radius: 8px;
     background-color: #f4f4f4;
+    width: 1500px;
+    font-weight: bolder;
+    font-size: x-large;
 }
 
 a {

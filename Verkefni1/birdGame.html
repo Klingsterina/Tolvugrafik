@@ -5,12 +5,9 @@
 
 attribute vec4 vPosition;
 attribute vec4 vColor;
-
 varying vec4 fColor;
 
-void
-main()
-{
+void main() {
     gl_Position = vPosition;
     fColor = vColor;
 }
@@ -19,11 +16,8 @@ main()
 <script id="fragment-shader" type="x-shader/x-fragment">
 
 precision mediump float;
-
 varying vec4 fColor;
-void
-main()
-{
+void main() {
     gl_FragColor = fColor;
 }
 </script>
@@ -37,12 +31,12 @@ main()
 <body>
     <a href="../index.html">Til baka</a>
     <br>
-    <div class="canvas-container">
-        <canvas class="canvas" id="gl-canvas" width="1500" height="1000"></canvas>
-    </div>
     <div class="scoreBoard">
-        <h3>Stigatafla</h3>
-        <p id="score">Stig: 0</p>
+        <h3 id="Stigatafla">Stigatafla</h3>
+        <p id="stig">Fuglar: </p>
+    </div>
+    <div class="canvas-container">
+        <canvas id="gl-canvas" width="1500" height="1000"></canvas>
     </div>
 </body>
 </html>
