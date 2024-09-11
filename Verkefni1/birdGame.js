@@ -14,8 +14,8 @@ let stig = "";
 let fuglar = 0;
 var skot = [];
 var birds = [];
-var numBirds = 1;
-var maxBirds = 10;
+var numBirds = 4;
+
 
 window.onload = function init() {
     canvas = document.getElementById("gl-canvas");
@@ -24,7 +24,7 @@ window.onload = function init() {
     if (!gl) { alert("WebGL isn't available"); }
 
     gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(0.6, 0.6, 0.8, 1.0);
+    gl.clearColor(0.6, 0.6, 0.8, 1.2);
 
     // Load shaders and initialize attribute buffers
     var program = initShaders(gl, "vertex-shader", "fragment-shader");
@@ -86,7 +86,7 @@ window.onload = function init() {
     // búa til keyevent fyrir bilstöngina
     window.addEventListener("keydown", function (e) {
         if (e.code == "Space") {
-            if (skot.length < 5) {
+            if (skot.length < 4) {
                 skot.push({
                     x: mouseVertices[1][0], // Byggir á miðpunkti byssunnar
                     y: -0.7,               // Byrjar rétt fyrir ofan byssuna
@@ -162,9 +162,6 @@ function endGame() {
     cancelAnimationFrame(renderId);
     gl.clear(gl.COLOR_BUFFER_BIT);
 
-    const canvas = document.getElementById("gl-canvas");
-    canvas.style.position = 'relative'
-
     const message = `Leik lokið! \n Þú hefur skotið ${numBirds} fugla.`;
     console.log(message);
 
@@ -239,6 +236,7 @@ function drawShots() {
             i--;
             continue;
         }
+        
         var skotVertices = [
             vec2(shot.x - 0.001, shot.y ),
             vec2(shot.x - 0.001, shot.y + 0.05),
@@ -289,6 +287,7 @@ function render() {
 
 
 //GEYMA KÓÐA
+// var maxBirds = 10;
 // // Bæta nýjum fugli við ef það eru færri en hámarki fugla
 // if (birds.length < maxBirds) {
 //     birds.push(...generateBirds(1)); // Bætir einum nýjum fugli við
