@@ -8,13 +8,13 @@ var mouseBufferId;        // Buffer fyrir byssuna
 var birdBufferId;         // Buffer fyrir fuglana
 var skotBufferId;         // Buffer fyrir skot
 var vPosition;
-var speed = Math.random();
+var speed = Math.random()-1;
 
-let stig = "";
-let fuglar = 0;
-var skot = [];
-var birds = [];
-var numBirds = 4;
+let stig = "";              // Stigin í leiknum
+let fuglarCounter = 0;      // Counter fyrir skotna fugla
+var skot = [];              // Fylki sem geymir upplýsingar um öll skot leikmannsins
+var birds = [];             // Fylki sem geymir upplýsingar um alla fugla í leiknum.
+var numBirds = 5;           // Fjöldi fugla sem byrtast í leiknum
 
 
 window.onload = function init() {
@@ -32,9 +32,9 @@ window.onload = function init() {
 
     // Hnit fyrir byssuna
     var mouseVertices = [
-        vec2(-0.1, -0.9),  // Bottom left
-        vec2(0.0, -0.7),   // Top center
-        vec2(0.1, -0.9)    // Bottom right 
+        vec2(-0.05, -0.95),  // Bottom left
+        vec2(0.0, -0.8),   // Top center
+        vec2(0.05, -0.95)    // Bottom right 
     ];
     
     // Tengir shader við breytur
@@ -86,11 +86,11 @@ window.onload = function init() {
     // búa til keyevent fyrir bilstöngina
     window.addEventListener("keydown", function (e) {
         if (e.code == "Space") {
-            if (skot.length < 4) {
+            if (skot.length < 3) {
                 skot.push({
                     x: mouseVertices[1][0], // Byggir á miðpunkti byssunnar
                     y: -0.7,               // Byrjar rétt fyrir ofan byssuna
-                    speed: 0.02            // Hraði skotsins
+                    speed: 0.04            // Hraði skotsins
                 });
             }
         }
@@ -100,20 +100,21 @@ window.onload = function init() {
     render();
 };
 
-
+//Býr til fugla á handahófskenndum stöðum með handahófskenndum hraða.
 function generateBirds(count) {
     let newBirds = [];
     for (let i = 0; i < count; i++) {
         newBirds.push({
             x: Math.random() * 2 - 1,  // x-staðsetning á bilinu -1 til 1
             y: Math.random() * 0.8 + 0.1, // y-staðsetning á bilinu 0.1 til 0.9 (ofar á skjánum)
-            speed: (Math.random() * 0.02 + 0.01) * (Math.random() > 0.3 ? 1 : -1) // hraði, þar sem sumir fara til vinstri
+            speed: (Math.random() * 0.01 + 0.009) * (Math.random() > 0.3 ? 1 : -1) // hraði, þar sem sumir fara til vinstri
         });
     }
     return newBirds;
 }
 
 //Athugar árekstur hjá fugli og skots
+//Ef leikmaður hittir alla fuglana þá er leik lokið
 function checkForCollisions() {
     for (let i = 0; i < skot.length; i++) {
         let shot = skot[i];
@@ -143,10 +144,10 @@ function checkForCollisions() {
                 console.log("bird hit")
 
                 stig+= "| ";
-                fuglar++;
+                fuglarCounter++;
                 document.getElementById("stig").innerText = `Fuglar: ${stig}`;
 
-                if (fuglar >= numBirds) {
+                if (fuglarCounter >= numBirds) {
                     endGame();
                     return;
                 }
@@ -157,7 +158,7 @@ function checkForCollisions() {
     }
 }
 
-//Fall sem endar leikinn
+//Fall sem byrtir leiklokið skilaboð
 function endGame() {
     cancelAnimationFrame(renderId);
     gl.clear(gl.COLOR_BUFFER_BIT);
@@ -182,6 +183,7 @@ function endGame() {
     })
 }
 
+//Endurhleður skjáinn
 function startGame() {
     location.reload();
 }
@@ -218,7 +220,7 @@ function drawBird() {
 
 //Teiknar byssuna
 function drawGun() {
-    // Teikna byssuna (óbreyttur kóði)
+    // Teikna byssuna
     gl.bindBuffer(gl.ARRAY_BUFFER, mouseBufferId);
     gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
     gl.drawArrays(gl.TRIANGLES, 0, 3);

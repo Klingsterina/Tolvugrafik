@@ -10,8 +10,8 @@ html {
 
 header {
     display: flex;
-    flex-direction: column; 
-    align-items: center;
+    flex-direction: column; /* Stacks children vertically */
+    align-items: center; /* Center horizontally */
 }
 
 .info {
@@ -22,6 +22,7 @@ header {
     margin-right: 1rem;
     width: fit-content;
     border-radius: 8px;
+    background-color: rgba(105, 173, 173, 0.368);
 }
 
 h1, h3 {
