@@ -85,13 +85,13 @@ window.onload = function init(){
     gl.uniform1f(uScale, skali);
     gl.uniform4fv(uColor, color);
 
-    moveTriangle()
+    moveSierpinski()
     render();
 };
 
-function moveTriangle() {
+function moveSierpinski() {
     canvas.addEventListener("wheel", function (e){
-        console.log("wheeling")
+        console.log("wheeling");
         var scaleFactor = e.deltaY > 0 ? 0.9 : 1.1; //fékk chatGBT til að hjálpa við þetta
         skali *= scaleFactor;
         skali = Math.max(0.01, Math.min(20, skali));
@@ -105,7 +105,6 @@ function moveTriangle() {
 
     canvas.addEventListener("mousedown", function (e){
         mouseDown = true;
-        console.log("muah");
         lastMousePos = {x: e.offsetX, y: e.offsetY};
     });
 

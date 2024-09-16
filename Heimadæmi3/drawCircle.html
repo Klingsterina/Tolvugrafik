@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+<title>Hringur</title>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+attribute vec4 vPosition;
+
+void main() {
+    gl_Position = vPosition;
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+uniform float time;
+uniform vec2 resolution;
+
+void main() {
+    vec4 color;
+    
+    // Fá stöðluð hnit bútar (gl_FragCoord er í skjáhnitum)
+    vec2 st = gl_FragCoord.xy / resolution.xy;
+    
+    // Breytum þeim í -1 til 1
+    st = 4.0*st - 2.0;
+
+    
+    vec2 center = vec2(sin(time* 0.001) - cos(time* 0.001));
+
+    st.x -= center.x;
+    st.y -= center.y;
+    //st.x += center.x;
+    //st.y += center.y;
+
+    
+    if (length(st) < 0.1)
+        color = vec4(1.0, 0.0, 1.0, 1.0);   // bleikur
+    else
+        color = vec4(0.0, 0.0, 1.0, 1.0);   // Blár
+    
+    gl_FragColor = color;
+}
+</script>
+
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="drawCircle.js"></script>
+</head>
+
+<body>
+    <a href="../index.html">Til baka</a>
+<canvas id="gl-canvas" width="600" height="600">
+</body>
+</html>
