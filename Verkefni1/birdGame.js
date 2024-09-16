@@ -37,6 +37,10 @@ window.onload = function init() {
 
     // Load shaders and initialize attribute buffers
     var program = initShaders(gl, "vertex-shader", "fragment-shader");
+    if (!program) {
+        console.error("Failed to initialize shaders.");
+        return;  // Prevent further execution if shaders fail to compile
+    }
     gl.useProgram(program);
 
     // Hnit fyrir byssuna
@@ -259,7 +263,7 @@ function drawShots() {
         gl.bufferSubData(gl.ARRAY_BUFFER, 0, flatten(skotVertices));
         gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
         gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
-        console.log("pew pew")
+        console.log("pew pew");
     };
 }
 
