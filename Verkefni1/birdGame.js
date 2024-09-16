@@ -1,3 +1,12 @@
+/************************************
+ * Höfundur: Eygló Ástþórsdóttir
+ * eya19@hi.is
+ * fun fact um mig: Eina sem ég kunni að forrita
+ * áður en ég byrjaði í hí var hello world í python
+ * og núna kann ég að búa til einfaldan leik í javascript.
+ ************************************/
+
+
 var canvas;
 var gl;
 var renderId;
