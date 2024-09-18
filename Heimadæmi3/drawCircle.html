@@ -24,13 +24,13 @@ void main() {
     vec2 st = gl_FragCoord.xy / resolution.xy;
     
     // Breytum þeim í -1 til 1
-    st = 4.0*st - 2.0;
+    st = 2.0*st - 1.0;
 
     
-    vec2 center = vec2(sin(time* 0.001) - cos(time* 0.001));
+    vec2 center = vec2(sin(time*0.005));
 
     st.x -= center.x;
-    st.y -= center.y;
+    //st.y -= center.y;
     //st.x += center.x;
     //st.y += center.y;
 
