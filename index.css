@@ -10,9 +10,22 @@ html {
 
 header {
     display: flex;
-    flex-direction: column; /* Stacks children vertically */
-    align-items: center; /* Center horizontally */
+    align-items: center; /* Vertically centers the children */
+    justify-content: space-between; /* Skiptir plássinu milli barna */
+    width: 100%; /* Tryggir að header tekur allt breidd */
 }
+
+.header-content {
+    display: flex;
+    flex-direction: column; /* Stacks h1 and div vertically */
+    text-align: center; /* Center text in the column */
+    margin: 0 auto;
+}
+
+/* canvas {
+    margin-left: 20px; /* Bætir smá bil milli canvas og annarra efna */
+
+
 
 .info {
     display: flex;

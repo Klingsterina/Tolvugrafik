@@ -26,10 +26,13 @@ void main() {
     // Breytum þeim í -1 til 1
     st = 2.0*st - 1.0;
 
-    
-    vec2 center = vec2(sin(time*0.005));
+    vec2 center = vec2(sin(time * 0.005), cos(time * 0.008));
+    //vec2 center = vec2(sin(time*0.005));
 
-    st.x -= center.x;
+    float yOffset = sin(time * 0.008);
+    float xOffset = sin(time * 0.001);
+    st.y += yOffset;
+    st.x -= xOffset;
     //st.y -= center.y;
     //st.x += center.x;
     //st.y += center.y;
