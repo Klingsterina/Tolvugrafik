@@ -129,61 +129,7 @@ function render()
     mv = mult( mv, rotateX(spinX) );
     mv = mult( mv, rotateY(spinY) ) ;
 
-    // Build the Billy
-    // First the right side
-    mv1 = mult( mv, translate( -0.3, 0.0, 0.0 ) );
-    mv1 = mult( mv1, scalem( 0.03, 1.0, 0.5 ) );
-    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
-    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
-
-    // Then the left side
-    mv1 = mult( mv, translate( 0.3, 0.0, 0.0 ) );
-    mv1 = mult( mv1, scalem( 0.03, 1.0, 0.5 ) );
-    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
-    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
-
-    // Then the lowest suport
-    mv1 = mult(mv, scalem(0.6, 0.03, 0.49))
-    mv1 = mult(mv1, translate(0.0, -13.0, 0.01));
-    // mv1 = mult( mv, translate( 0.0, -1.0, 0.2 ) );
-    // mv1 = mult( mv, rotate(90, [0,0,1]));
-    // mv1 = mult( mv1, scalem( 0.05, 0.6, 0.5 ) );
-    //mv1 = mult(mv1, translate(-7.0, 0.0, 0.0));
-    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
-    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
-
-    // Then the lowest shelf
-    mv1 = mult(mv, scalem(0.6, 0.03, 0.49))
-    mv1 = mult(mv1, translate(0.0, -3.0, 0.01));
-    // mv1 = mult( mv, translate(0.3, 0.0, 0.0));
-    // mv1 = mult( mv, rotate(90, [0,0,1]));
-    // mv1 = mult( mv1, scalem(0.05, 0.6, 0.5));
-    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
-    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
-
-    // Then the top shelf
-    mv1 = mult(mv, scalem(0.6, 0.03, 0.49))
-    mv1 = mult(mv1, translate(0.0, 7.0, 0.01));
-    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
-    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
-
-    // Then the top of the shelf
-    mv1 = mult(mv, scalem(0.6, 0.03, 0.49))
-    mv1 = mult(mv1, translate(0.0, 16.0, 0.01));
-    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
-    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
-
-    // cover on the foot
-    mv1 = mult(mv, scalem(0.6, 0.1, 0.03));
-    mv1 = mult(mv1, translate(0.0, -4.5, -6.5))
-    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
-    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
-
-    //back of the shelf
-    mv1 = mult( mv, translate( -0.0, 0.0, 0.24 ) );
-    mv1 = mult( mv1, scalem( 0.63, 1.0, 0.03 ) );
-    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
-    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
+    // Reynið sjálf áður en þið fáið svarið
     requestAnimFrame( render );
 }
 

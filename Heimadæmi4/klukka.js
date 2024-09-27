@@ -132,40 +132,8 @@ function quad(a, b, c, d)
 function render()
 {
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    rotation += 30;
-    var hourRotation = rotation*1/12;
-    var minuteRotation = rotation*1/6;
-    var secondsRotation = rotation*1/3
-
-    var mv = mat4();
-    mv = mult( mv, rotateX(spinX) );
-    mv = mult( mv, rotateY(spinY) );
-    // mv = mult( mv, rotateZ(spinZ));
-
-    // Build the clock
-    // build the hour arm
-    var hourArm = mult(mv, rotateZ(hourRotation)); // Rotate hour arm
-    var hourTip = mult(hourArm, translate(0.0, 0.58, 0.0)); // Get the tip of the hour arm
-    hourArm = mult(hourArm, scalem(0.05, 0.6, 0.05)); // Scale the hour arm
-    hourArm = mult(hourArm, translate(0.0, 0.5, 0.0))
-    gl.uniformMatrix4fv(matrixLoc, false, flatten(hourArm));
-    gl.drawArrays(gl.TRIANGLES, 0, numVertices);
-
-    // build the minute arm
-    var minuteArm = mult(hourTip, rotateZ(minuteRotation));
-    var minuteTip = mult(minuteArm, translate(0.0, 0.38, 0.0));
-    minuteArm = mult(minuteArm, scalem( 0.03, 0.4, 0.03 ) );
-    minuteArm = mult(minuteArm, translate(0.0, 0.5, 0.0));    
-    gl.uniformMatrix4fv(matrixLoc, false, flatten(minuteArm));
-    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
-
-    // Build the seconds arm
-    var secondsArm = mult(minuteTip, rotateZ(secondsRotation));
-    secondsArm = mult(secondsArm, scalem( 0.02, 0.3, 0.02 ));
-    secondsArm = mult(secondsArm, translate(0.0, 0.5, 0.0));
-    gl.uniformMatrix4fv(matrixLoc, false, flatten(secondsArm));
-    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
+    //Reynið sjálf, áður en þið fáið að vita hér....
+    
 
     requestAnimFrame( render );
 }
