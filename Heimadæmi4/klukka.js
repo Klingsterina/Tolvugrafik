@@ -1,3 +1,9 @@
+/////////////////////////////////////////////////////////////////
+//    Sýnidæmi í Tölvugrafík
+//     Búum til bókstafinn H úr þremur teningum
+//
+//    Hjálmtýr Hafsteinsson, september 2024
+/////////////////////////////////////////////////////////////////
 var canvas;
 var gl;
 
@@ -9,8 +15,10 @@ var colors = [];
 var movement = false;     // Do we rotate?
 var spinX = 0;
 var spinY = 0;
+var spinZ = 0;
 var origX;
 var origY;
+var rotation = 0.0;
 
 var matrixLoc;
 
@@ -125,65 +133,42 @@ function render()
 {
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+    rotation += 30;
+    var hourRotation = rotation*1/12;
+    var minuteRotation = rotation*1/6;
+    var secondsRotation = rotation*1/3
+
     var mv = mat4();
     mv = mult( mv, rotateX(spinX) );
-    mv = mult( mv, rotateY(spinY) ) ;
+    mv = mult( mv, rotateY(spinY) );
+    // mv = mult( mv, rotateZ(spinZ));
 
-    // Build the Billy
-    // First the right side
-    mv1 = mult( mv, translate( -0.3, 0.0, 0.0 ) );
-    mv1 = mult( mv1, scalem( 0.03, 1.0, 0.5 ) );
-    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
+    // Build the clock
+    // build the hour arm
+    var hourArm = mult(mv, rotateZ(hourRotation)); // Rotate hour arm
+    var hourTip = mult(hourArm, translate(0.0, 0.58, 0.0)); // Get the tip of the hour arm
+    hourArm = mult(hourArm, scalem(0.05, 0.6, 0.05)); // Scale the hour arm
+    hourArm = mult(hourArm, translate(0.0, 0.5, 0.0))
+    gl.uniformMatrix4fv(matrixLoc, false, flatten(hourArm));
+    gl.drawArrays(gl.TRIANGLES, 0, numVertices);
+
+    // build the minute arm
+    var minuteArm = mult(hourTip, rotateZ(minuteRotation));
+    var minuteTip = mult(minuteArm, translate(0.0, 0.38, 0.0));
+    minuteArm = mult(minuteArm, scalem( 0.03, 0.4, 0.03 ) );
+    minuteArm = mult(minuteArm, translate(0.0, 0.5, 0.0));    
+    gl.uniformMatrix4fv(matrixLoc, false, flatten(minuteArm));
     gl.drawArrays( gl.TRIANGLES, 0, numVertices );
 
-    // Then the left side
-    mv1 = mult( mv, translate( 0.3, 0.0, 0.0 ) );
-    mv1 = mult( mv1, scalem( 0.03, 1.0, 0.5 ) );
-    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
+    // Build the seconds arm
+    var secondsArm = mult(minuteTip, rotateZ(secondsRotation));
+    secondsArm = mult(secondsArm, scalem( 0.02, 0.3, 0.02 ));
+    secondsArm = mult(secondsArm, translate(0.0, 0.5, 0.0));
+    gl.uniformMatrix4fv(matrixLoc, false, flatten(secondsArm));
     gl.drawArrays( gl.TRIANGLES, 0, numVertices );
 
-    // Then the lowest suport
-    mv1 = mult(mv, scalem(0.6, 0.03, 0.49))
-    mv1 = mult(mv1, translate(0.0, -13.0, 0.01));
-    // mv1 = mult( mv, translate( 0.0, -1.0, 0.2 ) );
-    // mv1 = mult( mv, rotate(90, [0,0,1]));
-    // mv1 = mult( mv1, scalem( 0.05, 0.6, 0.5 ) );
-    //mv1 = mult(mv1, translate(-7.0, 0.0, 0.0));
-    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
-    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
-
-    // Then the lowest shelf
-    mv1 = mult(mv, scalem(0.6, 0.03, 0.49))
-    mv1 = mult(mv1, translate(0.0, -3.0, 0.01));
-    // mv1 = mult( mv, translate(0.3, 0.0, 0.0));
-    // mv1 = mult( mv, rotate(90, [0,0,1]));
-    // mv1 = mult( mv1, scalem(0.05, 0.6, 0.5));
-    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
-    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
-
-    // Then the top shelf
-    mv1 = mult(mv, scalem(0.6, 0.03, 0.49))
-    mv1 = mult(mv1, translate(0.0, 7.0, 0.01));
-    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
-    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
-
-    // Then the top of the shelf
-    mv1 = mult(mv, scalem(0.6, 0.03, 0.49))
-    mv1 = mult(mv1, translate(0.0, 16.0, 0.01));
-    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
-    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
-
-    // cover on the foot
-    mv1 = mult(mv, scalem(0.6, 0.1, 0.03));
-    mv1 = mult(mv1, translate(0.0, -4.5, -6.5))
-    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
-    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
-
-    //back of the shelf
-    mv1 = mult( mv, translate( -0.0, 0.0, 0.24 ) );
-    mv1 = mult( mv1, scalem( 0.63, 1.0, 0.03 ) );
-    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
-    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
     requestAnimFrame( render );
 }
 
+// mv1 = mult( mv, translate( 0.0, 1.0, 0.0 ) );
+    // minuteArm = mult(minuteArm, translate(0.0, 1.0, 0.0))

@@ -1,0 +1,51 @@
+<html>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+
+attribute  vec4 vPosition;
+attribute  vec4 vColor;
+varying vec4 fColor;
+
+uniform mat4 transform;
+
+void main() 
+{
+    fColor = vColor;
+    gl_Position = transform * vPosition;
+} 
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+precision mediump float;
+   
+varying vec4 fColor;
+
+void main()
+{
+    gl_FragColor = fColor;
+}
+</script>
+
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="klukka.js"></script>
+
+<body>
+    <a href="../index.html"></a>
+<canvas id="gl-canvas" width="700" height="700"></canvas>
+<h2>Lýsing á verkefninu</h2>
+<p>Skrifið WebGL forrit sem hermir þessa klukku. Hver armur á að vera teningur sem þarf
+    að kvarða, hliðra og snúa. Vísarnir eiga að liggja í xy-sléttunni (þ.a. snúningurinn er um
+    z-ás) og eiga að snúast rétt, þannig að fyrir hvern heilan hring sekúntuarmsins snýst
+    mínútuarmurinn sem svarar einni mínútu (þ.e. 1/60 af heilum hring). Samsvarandi gildir
+    með klukkustundararminn. Þið eigið bara að uppfæra sekúntuarminn um eina sekúntu í
+    hverri ítrun render-fallsins (og hina armana samsvarandi). Þetta gefur auðvitað ekki
+    réttan tíma, en sýnir hreyfingu klukkunnar. Til að gera klukkuna aðeins skýrari megið þið
+    setja bakgrunn fyrir hana (mjög flatur teningur, sem er hliðrað aðeins til baka). Leyfið
+    notandanum að snúa klukkunni með músarhreyfingum, svipað og gert er í sýniforritinu
+    solkerfi.</p>
+
+</body>
+</html>
