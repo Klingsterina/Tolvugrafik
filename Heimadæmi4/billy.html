@@ -1,0 +1,46 @@
+<html>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+
+attribute  vec4 vPosition;
+attribute  vec4 vColor;
+varying vec4 fColor;
+
+uniform mat4 transform;
+
+void main() 
+{
+    fColor = vColor;
+    gl_Position = transform * vPosition;
+} 
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+precision mediump float;
+   
+varying vec4 fColor;
+
+void main()
+{
+    gl_FragColor = fColor;
+}
+</script>
+
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="billy.js"></script>
+
+<body>
+    <a href="../index.html">Til baka</a>
+<canvas id="gl-canvas" width="512" height="512"></canvas>
+<div>
+    <h2>Lýsing af verkefninu</h2>
+    <p>Skrifið WebGL forrit sem býr til bókaskápinn fræga BILLY. Hjá okkur er hann samsettur
+        úr 7 teningum (hliðarnar tvær, botninn, toppurinn, bakið og tvær hillur). Notið teninga
+        þar sem hver hlið hefur einn lit (sjá <a href="https://hjalmtyr.github.io/WebGL-forrit/Angel/cube-js.html">cube-js</a>). Notandinn á að geta snúið skrifborðinu
+        með músinni, svipað og í sýniforritinu <a href="https://hjalmtyr.github.io/WebGL-forrit/Angel/letterH.html">letterH</a>. Skilið skjámynd og hlekk á forritið.</p>
+</div>
+</body>
+</html>
