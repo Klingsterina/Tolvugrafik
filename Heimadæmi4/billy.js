@@ -110,6 +110,18 @@ function quad(a, b, c, d)
         [ 1.0, 1.0, 1.0, 1.0 ]   // white
     ];
 
+    //Hér er mjög kúl grár skápur
+    // var vertexColors = [
+    //     [ 0.2, 0.2, 0.2, 1.0 ],   // dark gray
+    //     [ 0.3, 0.3, 0.3, 1.0 ],   // medium dark gray
+    //     [ 0.4, 0.4, 0.4, 1.0 ],   // medium gray
+    //     [ 0.0, 0.0, 0.0, 1.0 ],   // black
+    //     [ 0.25, 0.25, 0.25, 1.0 ], // black-gray
+    //     [ 0.45, 0.45, 0.45, 1.0 ], // lighter medium gray
+    //     [ 0.35, 0.35, 0.35, 1.0 ], // charcoal
+    //     [ 0.5, 0.5, 0.5, 1.0 ]    // light gray (soft highlight)
+    // ];
+
     //vertex color assigned by the index of the vertex
     var indices = [ a, b, c, a, c, d ];
 
@@ -129,7 +141,54 @@ function render()
     mv = mult( mv, rotateX(spinX) );
     mv = mult( mv, rotateY(spinY) ) ;
 
-    // Reynið sjálf áður en þið fáið svarið
+    // Build the Billy
+    // First the right side
+    mv1 = mult( mv, translate( -0.3, 0.0, 0.0 ) );
+    mv1 = mult( mv1, scalem( 0.03, 1.0, 0.5 ) );
+    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
+    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
+
+    // Then the left side
+    mv1 = mult( mv, translate( 0.3, 0.0, 0.0 ) );
+    mv1 = mult( mv1, scalem( 0.03, 1.0, 0.5 ) );
+    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
+    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
+
+    // Then the lowest suport
+    mv1 = mult(mv, scalem(0.6, 0.03, 0.49))
+    mv1 = mult(mv1, translate(0.0, -13.0, 0.01));
+    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
+    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
+
+    // Then the lowest shelf
+    mv1 = mult(mv, scalem(0.6, 0.03, 0.49))
+    mv1 = mult(mv1, translate(0.0, -3.0, 0.01));
+    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
+    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
+
+    // Then the top shelf
+    mv1 = mult(mv, scalem(0.6, 0.03, 0.49))
+    mv1 = mult(mv1, translate(0.0, 7.0, 0.01));
+    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
+    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
+
+    // Then the top of the shelf
+    mv1 = mult(mv, scalem(0.6, 0.03, 0.49))
+    mv1 = mult(mv1, translate(0.0, 16.0, 0.01));
+    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
+    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
+
+    // cover on the foot
+    mv1 = mult(mv, scalem(0.6, 0.1, 0.03));
+    mv1 = mult(mv1, translate(0.0, -4.5, -6.5))
+    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
+    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
+
+    //back of the shelf
+    mv1 = mult( mv, translate( -0.0, 0.0, 0.24 ) );
+    mv1 = mult( mv1, scalem( 0.63, 1.0, 0.03 ) );
+    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
+    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
     requestAnimFrame( render );
 }
 
