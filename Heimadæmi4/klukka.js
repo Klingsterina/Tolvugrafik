@@ -174,29 +174,29 @@ function render(){
     var hourArm = mult(mv, rotateZ(hourRotation)); // Rotate hour arm
     var hourTip = mult(hourArm, translate(0.0, 0.38, -0.04)); // Get the tip of the hour arm
     hourArm = mult(hourArm, scalem(0.05, 0.4, 0.05)); // Scale the hour arm
-    hourArm = mult(hourArm, translate(0.0, 0.5, 0.0))
+    hourArm = mult(hourArm, translate(0.0, 0.5, 0.0)) // move the hour arm little bit up
     gl.uniformMatrix4fv(matrixLoc, false, flatten(hourArm));
     gl.drawArrays(gl.TRIANGLES, 0, numVertices);
 
     // build the minute arm
-    var minuteArm = mult(hourTip, rotateZ(minuteRotation));
-    var minuteTip = mult(minuteArm, translate(0.0, 0.29, -0.023));
-    minuteArm = mult(minuteArm, scalem( 0.02, 0.3, 0.03 ) );
-    minuteArm = mult(minuteArm, translate(0.0, 0.5, 0.0));    
+    var minuteArm = mult(hourTip, rotateZ(minuteRotation)); // Rotate the minute arm around the hourtip
+    var minuteTip = mult(minuteArm, translate(0.0, 0.29, -0.023)); // get the tip of the minute arm
+    minuteArm = mult(minuteArm, scalem( 0.02, 0.3, 0.03 ) ); // scale the minute arm
+    minuteArm = mult(minuteArm, translate(0.0, 0.5, 0.0)); // move the minute arm little bit up
     gl.uniformMatrix4fv(matrixLoc, false, flatten(minuteArm));
     gl.drawArrays( gl.TRIANGLES, 0, numVertices );
 
     // Build the seconds arm
-    var secondsArm = mult(minuteTip, rotateZ(secondsRotation));
-    secondsArm = mult(secondsArm, scalem( 0.01, 0.2, 0.02 ));
-    secondsArm = mult(secondsArm, translate(0.0, 0.5, 0.0));
+    var secondsArm = mult(minuteTip, rotateZ(secondsRotation)); // rotate the seconds arm around the minute tip
+    secondsArm = mult(secondsArm, scalem( 0.01, 0.2, 0.02 )); // scale the seconds arm
+    secondsArm = mult(secondsArm, translate(0.0, 0.5, 0.0)); // move the seconds arm little bit up
     gl.uniformMatrix4fv(matrixLoc, false, flatten(secondsArm));
     gl.drawArrays( gl.TRIANGLES, 0, numVertices );
 
     //Build a background
-    mv1 = mult(mv, scalem(2.0, 2.0, 0.005));
-    mv1 = mult(mv1, translate(0.0, 0.0, 5.0))
-    mv1 = mult(mv1, rotate(90, [1,0,0]))
+    mv1 = mult(mv, scalem(2.0, 2.0, 0.005)); // scale up the cube and smush it flat
+    mv1 = mult(mv1, translate(0.0, 0.0, 5.0)); // move it a little bit back
+    mv1 = mult(mv1, rotate(90, [1,0,0])) // make the color be the back side of the plane
     gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
     gl.drawArrays( gl.TRIANGLES, 0, numVertices );
 
