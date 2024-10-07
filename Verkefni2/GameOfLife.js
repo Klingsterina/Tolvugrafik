@@ -97,7 +97,7 @@ function initializeCellStates() {
     }
 }
 
-function createCube(position, color) {
+function createCube(position) {
     var size = 0.05; // Size of the cube
     var vertices = [
         vec3(-size, -size, size),   // Front face
@@ -110,20 +110,32 @@ function createCube(position, color) {
         vec3(size, -size, -size)
     ];
 
+    // Define colors for each face
+    var faceColors = [
+        [1.0, 0.0, 0.0, 1.0], // Front face - Red
+        [0.0, 1.0, 0.0, 1.0], // Back face - Green
+        [0.0, 0.0, 1.0, 1.0], // Left face - Blue
+        [1.0, 1.0, 0.0, 1.0], // Right face - Yellow
+        [1.0, 0.0, 1.0, 1.0], // Top face - Magenta
+        [0.0, 1.0, 1.0, 1.0]  // Bottom face - Cyan
+    ];
+
     var indices = [
         1, 0, 3, 1, 3, 2, // Front face
         5, 4, 7, 5, 7, 6, // Back face
         4, 0, 1, 4, 1, 5, // Left face
         6, 2, 3, 6, 3, 7, // Right face
-        1, 2, 6, 1, 6, 5, // Top face (corrected)
-        0, 4, 7, 0, 7, 3  // Bottom face (corrected)
+        1, 2, 6, 1, 6, 5, // Top face
+        0, 4, 7, 0, 7, 3  // Bottom face
     ];
 
     for (var i = 0; i < indices.length; ++i) {
         points.push(add(vertices[indices[i]], position));
-        colors.push(color);
+        // Assign color based on the face index
+        colors.push(faceColors[Math.floor(i / 6)]); // 6 vertices per face
     }
 }
+
 
 
 function createCubes() {
