@@ -1,7 +1,8 @@
 var canvas;
 var gl;
+var vBuffer; // Declare vBuffer globally
 
-var numVertices  = 36;
+var gridSize = 10;
 
 var points = [];
 var colors = [];
@@ -13,27 +14,28 @@ var origX;
 var origY;
 
 var matrixLoc;
+var cellStates = [];
+var nextCellStates = [];
 
-window.onload = function init()
-{
+window.onload = function init(){
     canvas = document.getElementById( "gl-canvas" );
-    
+
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
 
-    colorCube();
-
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
-    
     gl.enable(gl.DEPTH_TEST);
 
-    //
-    //  Load shaders and initialize attribute buffers
-    //
     var program = initShaders( gl, "vertex-shader", "fragment-shader" );
     gl.useProgram( program );
-    
+
+    // Initialize cell states
+    initializeCellStates();
+
+    // Setup cube vertices and colors
+    createCubes();
+
     var cBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW );
@@ -42,7 +44,7 @@ window.onload = function init()
     gl.vertexAttribPointer( vColor, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vColor );
 
-    var vBuffer = gl.createBuffer();
+    vBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW );
 
@@ -52,99 +54,157 @@ window.onload = function init()
 
     matrixLoc = gl.getUniformLocation( program, "transform" );
 
-    //event listeners for mouse
+    // Mouse event listeners for rotation
     canvas.addEventListener("mousedown", function(e){
         movement = true;
         origX = e.offsetX;
         origY = e.offsetY;
-        e.preventDefault();         // Disable drag and drop
-    } );
+        e.preventDefault();
+    });
 
     canvas.addEventListener("mouseup", function(e){
         movement = false;
-    } );
+    });
 
     canvas.addEventListener("mousemove", function(e){
-        if(movement) {
-    	    spinY = ( spinY + (origX - e.offsetX) ) % 360;
-            spinX = ( spinX + (origY - e.offsetY) ) % 360;
+        if (movement) {
+            spinY = (spinY + (origX - e.offsetX)) % 360;
+            spinX = (spinX + (origY - e.offsetY)) % 360;
             origX = e.offsetX;
             origY = e.offsetY;
         }
-    } );
-    
+    });
+
+    // Game loop
+    setInterval(updateCellStates, 800); // Update cell states every 500 ms
+
     render();
 }
 
-function colorCube()
-{
-    quad( 1, 0, 3, 2 );
-    quad( 2, 3, 7, 6 );
-    quad( 3, 0, 4, 7 );
-    quad( 6, 5, 1, 2 );
-    quad( 4, 5, 6, 7 );
-    quad( 5, 4, 0, 1 );
+function initializeCellStates() {
+    // Initialize cells in a 3D grid with random states
+    for (var x = 0; x < gridSize; x++) {
+        cellStates[x] = [];
+        nextCellStates[x] = [];
+        for (var y = 0; y < gridSize; y++) {
+            cellStates[x][y] = [];
+            nextCellStates[x][y] = [];
+            for (var z = 0; z < gridSize; z++) {
+                cellStates[x][y][z] = Math.random() > 0.7 ? 1 : 0;
+                nextCellStates[x][y][z] = 0;
+            }
+        }
+    }
 }
 
-function quad(a, b, c, d) 
-{
+function createCube(position, color) {
+    var size = 0.05; // Size of the cube
     var vertices = [
-        vec3( -0.5, -0.5,  0.5 ),
-        vec3( -0.5,  0.5,  0.5 ),
-        vec3(  0.5,  0.5,  0.5 ),
-        vec3(  0.5, -0.5,  0.5 ),
-        vec3( -0.5, -0.5, -0.5 ),
-        vec3( -0.5,  0.5, -0.5 ),
-        vec3(  0.5,  0.5, -0.5 ),
-        vec3(  0.5, -0.5, -0.5 )
+        vec3(-size, -size, size),   // Front face
+        vec3(-size, size, size),
+        vec3(size, size, size),
+        vec3(size, -size, size),
+        vec3(-size, -size, -size),  // Back face
+        vec3(-size, size, -size),
+        vec3(size, size, -size),
+        vec3(size, -size, -size)
     ];
 
-    var vertexColors = [
-        [ 0.0, 0.0, 0.0, 1.0 ],  // black
-        [ 1.0, 0.0, 0.0, 1.0 ],  // red
-        [ 1.0, 1.0, 0.0, 1.0 ],  // yellow
-        [ 0.0, 1.0, 0.0, 1.0 ],  // green
-        [ 0.0, 0.0, 1.0, 1.0 ],  // blue
-        [ 1.0, 0.0, 1.0, 1.0 ],  // magenta
-        [ 0.0, 1.0, 1.0, 1.0 ],  // cyan
-        [ 1.0, 1.0, 1.0, 1.0 ]   // white
+    var indices = [
+        1, 0, 3, 1, 3, 2, // Front face
+        5, 4, 7, 5, 7, 6, // Back face
+        4, 0, 1, 4, 1, 5, // Left face
+        6, 2, 3, 6, 3, 7, // Right face
+        1, 2, 6, 1, 6, 5, // Top face (corrected)
+        0, 4, 7, 0, 7, 3  // Bottom face (corrected)
     ];
 
-    //Hér er mjög kúl grár skápur
-    // var vertexColors = [
-    //     [ 0.2, 0.2, 0.2, 1.0 ],   // dark gray
-    //     [ 0.3, 0.3, 0.3, 1.0 ],   // medium dark gray
-    //     [ 0.4, 0.4, 0.4, 1.0 ],   // medium gray
-    //     [ 0.0, 0.0, 0.0, 1.0 ],   // black
-    //     [ 0.25, 0.25, 0.25, 1.0 ], // black-gray
-    //     [ 0.45, 0.45, 0.45, 1.0 ], // lighter medium gray
-    //     [ 0.35, 0.35, 0.35, 1.0 ], // charcoal
-    //     [ 0.5, 0.5, 0.5, 1.0 ]    // light gray (soft highlight)
-    // ];
-
-    //vertex color assigned by the index of the vertex
-    var indices = [ a, b, c, a, c, d ];
-
-    for ( var i = 0; i < indices.length; ++i ) {
-        points.push( vertices[indices[i]] );
-        colors.push(vertexColors[a]);
-        
+    for (var i = 0; i < indices.length; ++i) {
+        points.push(add(vertices[indices[i]], position));
+        colors.push(color);
     }
 }
 
 
-function render()
-{
-    gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+function createCubes() {
+    points = [];
+    colors = [];
+    var offset = gridSize / 2; // Original offset for centering the grid
+    var spacing = 0.1; // Set the spacing between cubes
+
+    for (var x = 0; x < gridSize; x++) {
+        for (var y = 0; y < gridSize; y++) {
+            for (var z = 0; z < gridSize; z++) {
+                if (cellStates[x][y][z] === 1) {
+                    createCube(
+                        vec3((x - offset) * spacing, (y - offset) * spacing, (z - offset) * spacing),
+                        [0.0, 1.0, 0.0, 1.0]
+                    ); // Green cubes represent live cells
+                }
+            }
+        }
+    }
+}
+
+
+function countNeighbors(x, y, z) {
+    var count = 0;
+    for (var dx = -1; dx <= 1; dx++) {
+        for (var dy = -1; dy <= 1; dy++) {
+            for (var dz = -1; dz <= 1; dz++) {
+                if (dx === 0 && dy === 0 && dz === 0) continue;
+                var nx = x + dx;
+                var ny = y + dy;
+                var nz = z + dz;
+                if (
+                    nx >= 0 && nx < gridSize &&
+                    ny >= 0 && ny < gridSize &&
+                    nz >= 0 && nz < gridSize
+                ) {
+                    count += cellStates[nx][ny][nz];
+                }
+            }
+        }
+    }
+    return count;
+}
+
+function updateCellStates() {
+    for (var x = 0; x < gridSize; x++) {
+        for (var y = 0; y < gridSize; y++) {
+            for (var z = 0; z < gridSize; z++) {
+                var neighbors = countNeighbors(x, y, z);
+                if (cellStates[x][y][z] === 1) {
+                    nextCellStates[x][y][z] = neighbors === 2 || neighbors === 3 ? 1 : 0;
+                } else {
+                    nextCellStates[x][y][z] = neighbors === 3 ? 1 : 0;
+                }
+            }
+        }
+    }
+    // Swap the current and next states
+    var temp = cellStates;
+    cellStates = nextCellStates;
+    nextCellStates = temp;
+
+    // Recreate the cubes based on the new states
+    createCubes();
+
+    // Update buffer data
+    gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW);
+}
+
+function render() {
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     var mv = mat4();
-    mv = mult( mv, rotateX(spinX) );
-    mv = mult( mv, rotateY(spinY) ) ;
+    mv = mult(mv, rotateX(spinX));
+    mv = mult(mv, rotateY(spinY));
 
-    mv1 = mult(mv, scalem(0.5, 0.5, 0.5));
-    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
-    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
-    
-    requestAnimFrame( render );
+    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv));
+    gl.drawArrays(gl.TRIANGLES, 0, points.length);
+
+    requestAnimFrame(render);
 }
 
