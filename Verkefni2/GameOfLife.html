@@ -1,38 +1,62 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
-<script id="vertex-shader" type="x-shader/x-vertex">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conway's Game of Life in 3D</title>
+    <script id="vertex-shader" type="x-shader/x-vertex">
+        attribute vec4 vPosition;
+        attribute vec4 vColor;
+        uniform mat4 transform;
+        varying vec4 fColor;
 
-    attribute vec4 vPosition;
-    attribute vec4 vColor;
-    uniform mat4 transform;
-    varying vec4 fColor;
-    
-    void main() {
-        gl_Position = transform * vPosition;
-        fColor = vColor;
-    }
-</script>
+        void main() {
+            gl_Position = transform * vPosition;
+            fColor = vColor;
+        }
+    </script>
 
-<script id="fragment-shader" type="x-shader/x-fragment">
+    <script id="fragment-shader" type="x-shader/x-fragment">
+        precision mediump float;
+        varying vec4 fColor;
 
-    precision mediump float;
-    varying vec4 fColor;
-    
-    void main() {
-        gl_FragColor = fColor;
-    }
-</script>
+        void main() {
+            gl_FragColor = fColor;
+        }
+    </script>
 
-<script type="text/javascript" src="../Common/webgl-utils.js"></script>
-<script type="text/javascript" src="../Common/initShaders.js"></script>
-<script type="text/javascript" src="../Common/MV.js"></script>
-<script type="text/javascript" src="GameOfLife.js"></script>
+    <script type="text/javascript" src="../Common/webgl-utils.js"></script>
+    <script type="text/javascript" src="../Common/initShaders.js"></script>
+    <script type="text/javascript" src="../Common/MV.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        canvas {
+            border: 1px solid black;
+        }
+
+        h2 {
+            margin-top: 10px;
+        }
+    </style>
+</head>
 
 <body>
     <a href="../index.html">Til baka</a>
-<canvas id="gl-canvas" width="512" height="512"></canvas>
-<div>
-    <h2>Lýsing af verkefninu</h2>
-</div>
+    <canvas id="gl-canvas" width="512" height="512"></canvas>
+    <div>
+        <h2>Lýsing af verkefninu</h2>
+        <p>Þetta verkefni er einfaldur leikur um lífið í þrívídd með kubum sem tákna lifandi frumur.</p>
+    </div>
+
+    <script type="text/javascript" src="GameOfLife.js"></script>
 </body>
+
 </html>

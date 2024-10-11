@@ -6,12 +6,17 @@ var gridSize = 10;
 
 var points = [];
 var colors = [];
+var numVertices = 36;
 
 var movement = false;     // Do we rotate?
 var spinX = 0;
 var spinY = 0;
 var origX;
 var origY;
+var zoom = 1.0; // Default zoom level
+var tween = 0.0;
+var cubes = []; // 3D array for cube states
+var prevCubes = []; // 3D array for previous cube states
 
 var matrixLoc;
 var cellStates = [];
@@ -75,6 +80,15 @@ window.onload = function init(){
         }
     });
 
+    canvas.addEventListener("wheel", function(e) {
+        // Prevent the default scrolling behavior
+        e.preventDefault();
+    
+        // Adjust zoom level based on scroll direction
+        zoom *= (e.deltaY < 0) ? 1.1 : 0.9; // Zoom in or out
+        zoom = Math.max(0.1, Math.min(zoom, 10)); // Limit zoom level
+    });
+
     // Game loop
     setInterval(updateCellStates, 800); // Update cell states every 500 ms
 
@@ -98,7 +112,7 @@ function initializeCellStates() {
 }
 
 function createCube(position) {
-    var size = 0.05; // Size of the cube
+    var size = 0.045; // Size of the cube
     var vertices = [
         vec3(-size, -size, size),   // Front face
         vec3(-size, size, size),
@@ -136,8 +150,6 @@ function createCube(position) {
     }
 }
 
-
-
 function createCubes() {
     points = [];
     colors = [];
@@ -149,15 +161,13 @@ function createCubes() {
             for (var z = 0; z < gridSize; z++) {
                 if (cellStates[x][y][z] === 1) {
                     createCube(
-                        vec3((x - offset) * spacing, (y - offset) * spacing, (z - offset) * spacing),
-                        [0.0, 1.0, 0.0, 1.0]
-                    ); // Green cubes represent live cells
+                        vec3((x - offset) * spacing, (y - offset) * spacing, (z - offset) * spacing)
+                    );
                 }
             }
         }
     }
 }
-
 
 function countNeighbors(x, y, z) {
     var count = 0;
@@ -211,6 +221,7 @@ function render() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     var mv = mat4();
+    mv = mult( mv, scalem(zoom, zoom, zoom) );
     mv = mult(mv, rotateX(spinX));
     mv = mult(mv, rotateY(spinY));
 
@@ -219,4 +230,3 @@ function render() {
 
     requestAnimFrame(render);
 }
-
