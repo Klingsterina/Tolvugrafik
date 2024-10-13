@@ -34,34 +34,23 @@
     <script type="text/javascript" src="../Common/webgl-utils.js"></script>
     <script type="text/javascript" src="../Common/initShaders.js"></script>
     <script type="text/javascript" src="../Common/MV.js"></script>
-
-    <style>
-        body {
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        canvas {
-            border: 1px solid black;
-        }
-
-        h2 {
-            margin-top: 10px;
-        }
-    </style>
+    <script type="text/javascript" src="GameOfLife.js"></script>
+    <link rel="stylesheet" href="GameOfLife.css">
 </head>
 
 <body>
-    <a href="../index.html">Til baka</a>
-    <canvas id="gl-canvas" width="512" height="512"></canvas>
-    <div>
+    <div class="body">
+        <canvas class="cannvas" id="gl-canvas" width="512" height="512"></canvas>
         <h2>Lýsing af verkefninu</h2>
-        <p>Þetta verkefni er einfaldur leikur um lífið í þrívídd með kubum sem tákna lifandi frumur.</p>
+        <div class="lysing">
+            <p>Í tvívíða leiknum eru reglurnar þær að hólf eru lifandi eða dauð. Í hverri ítrun er fyrir hvert
+                hólf athugað hversu mörg nágrannahólf eru lifandi. Ef hólfið sjálft er lifandi og það eru færri
+                en 3 lifandi nágrannar þá deyr það úr einangrun, ef það eru hins vegar fleiri en 4 lifandi
+                nágrannar þá deyr hólfið úr troðningi. Hólfið lifir því einungis áfram ef fjöldi nágranna er 3
+                eða 4. Ef hólfið er ekki lifandi fyrir þá kviknar líf í því ef fjöldi nágranna er nákvæmlega 3.</p>
+        </div>
+            <a href="../index.html">Til baka</a>
     </div>
-
-    <script type="text/javascript" src="GameOfLife.js"></script>
 </body>
 
 </html>

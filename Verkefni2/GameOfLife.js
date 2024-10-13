@@ -19,6 +19,7 @@ var matrixLoc;
 var cellStates = [];
 var nextCellStates = [];
 
+
 window.onload = function init(){
     canvas = document.getElementById( "gl-canvas" );
 
@@ -26,7 +27,7 @@ window.onload = function init(){
     if ( !gl ) { alert( "WebGL isn't available" ); }
 
     gl.viewport( 0, 0, canvas.width, canvas.height );
-    gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
+    // gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
     gl.enable(gl.DEPTH_TEST);
 
     colorCube();
@@ -49,6 +50,12 @@ window.onload = function init(){
     render();
 }
 
+/**
+ * Upphafsstillir WebGL bufferana fyrir staðsetningar- og litagögn.
+ * Bindir og bufferar hnit og litagögn í GPU fyrir teikningu.
+ *
+ * @param {WebGLProgram} program - WebGL forritið sem inniheldur shadera.
+ */
 function initializeBuffers(program) {
     var cBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
@@ -69,14 +76,109 @@ function initializeBuffers(program) {
     matrixLoc = gl.getUniformLocation( program, "transform" );
 }
 
-function gameLoop() {
-    updateCellStates();
-    tween = 0;
-    setTimeout(function() {
-        gameLoop();
-    }, 900);
+/**
+ * Setur upp músarstýringar fyrir snúning á grindinni.
+ * Hlustar á músarviðburði til að stýra snúningi og zoom.
+ */
+function setupMouseControls() {
+    // Mouse event listeners for rotation
+    canvas.addEventListener("mousedown", function(e){
+        movement = true;
+        origX = e.offsetX;
+        origY = e.offsetY;
+        e.preventDefault();
+    });
+    
+    canvas.addEventListener("mouseup", function(e){
+        movement = false;
+    });
+    
+    canvas.addEventListener("mousemove", function(e){
+        if (movement) {
+            spinY = (spinY + (origX - e.offsetX)) % 360;
+            spinX = (spinX + (origY - e.offsetY)) % 360;
+            origX = e.offsetX;
+            origY = e.offsetY;
+
+            updateGradient();
+        }
+    });
+    
+    canvas.addEventListener("wheel", function(e) {
+        e.preventDefault();
+        
+        // Stilla zoom-levelið eftir scroll-áttinni
+        zoom *= (e.deltaY < 0) ? 1.1 : 0.9; // Zoom in eða út
+        zoom = Math.max(0.1, Math.min(zoom, 10)); // Limita zoom levelið
+    });
 }
 
+/**
+ * Fall til að uppfæra gradient
+ */
+function updateGradient() {
+    const angle = Math.atan2(spinY, spinX) * (180 / Math.PI); // Reikna út snúning
+    const gradient = `linear-gradient(${angle}deg, rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.5))`;
+    canvas.style.background = gradient; // Setja gradient á canvas
+}
+
+/**
+ * Býr til 6 hliðar teningsins og litsetur þær.
+ */
+function colorCube(){
+    quad( 1, 0, 3, 2 );
+    quad( 2, 3, 7, 6 );
+    quad( 3, 0, 4, 7 );
+    quad( 6, 5, 1, 2 );
+    quad( 4, 5, 6, 7 );
+    quad( 5, 4, 0, 1 );
+}
+
+/**
+ * Hjálparfall sem teiknar fjórhyrning byggðan á fjórum hornum með gögnum um staðsetningu og lit.
+ *
+ * @param {number} a - Fyrsta horn fjórhyrningsins.
+ * @param {number} b - Annað horn fjórhyrningsins.
+ * @param {number} c - Þriðja horn fjórhyrningsins.
+ * @param {number} d - Fjórða horn fjórhyrningsins.
+ */
+function quad(a, b, c, d) {
+    var vertices = [
+        vec3( -0.5, -0.5,  0.5 ),
+        vec3( -0.5,  0.5,  0.5 ),
+        vec3(  0.5,  0.5,  0.5 ),
+        vec3(  0.5, -0.5,  0.5 ),
+        vec3( -0.5, -0.5, -0.5 ),
+        vec3( -0.5,  0.5, -0.5 ),
+        vec3(  0.5,  0.5, -0.5 ),
+        vec3(  0.5, -0.5, -0.5 )
+    ];
+    
+    var vertexColors = [
+        [ 1.0, 0.45, 0.0, 1.0 ],    // djúp appelsínugulur
+        [ 1.0, 0.65, 0.1, 1.0 ],    // ljós appelsínugulur
+        [ 1.0, 0.85, 0.3, 1.0 ],    // mildur gul-appelsínugulur
+        [ 0.93, 0.33, 0.0, 1.0 ],   // rauð-appelsínugulur
+        [ 0.85, 0.54, 0.13, 1.0 ],  // gullin-brúnn
+        [ 1.0, 0.55, 0.2, 1.0 ],    // appelsínurauður
+        [ 0.98, 0.6, 0.01, 1.0 ],   // gylltur appelsínugulur
+        [ 1.0, 0.75, 0.5, 1.0 ]     // föl appelsínugulur
+    ];
+    
+    //vertex color assigned by the index of the vertex
+    var indices = [ a, b, c, a, c, d ];
+    
+    for ( var i = 0; i < indices.length; ++i ) {
+        points.push( vertices[indices[i]] );
+        colors.push(vertexColors[a]);
+        
+    }
+}
+
+/**
+ * Upphafsstillir ástand frumna fyrir 3D grind.
+ * Hver fruma fær handahófskennt upphafsástand, annaðhvort lifandi (1) eða dauð (0).
+ */
 function initializeCellStates() {
     // Initialize cells in a 3D grid with random states
     for (var x = 0; x < gridSize; x++) {
@@ -93,6 +195,10 @@ function initializeCellStates() {
     }
 }
 
+/**
+ * Telur fjölda lifandi nágranna fyrir frumu í staðsetningu (x, y, z).
+ * Skilar fjölda lifandi nágranna.
+ */
 function countNeighbors(x, y, z) {
     var count = 0;
     for (var dx = -1; dx <= 1; dx++) {
@@ -103,7 +209,6 @@ function countNeighbors(x, y, z) {
                 var ny = y + dy;
                 var nz = z + dz;
                 if (
-                    // console.log(gridSize);
                     nx >= 0 && nx < gridSize &&
                     ny >= 0 && ny < gridSize &&
                     nz >= 0 && nz < gridSize
@@ -116,6 +221,10 @@ function countNeighbors(x, y, z) {
     return count;
 }
 
+/**
+ * Uppfærir ástand allra frumna í grindinni eftir reglum Conway's Game of Life.
+ * Flytur núverandi ástand yfir á næsta ástand áður en reiknað er.
+ */
 function updateCellStates() {
     for (var x = 0; x < gridSize; x++) {
         for (var y = 0; y < gridSize; y++) {
@@ -137,85 +246,24 @@ function updateCellStates() {
             }
         }
     }
-    // Swap the current and next states
-
 }
 
-function colorCube()
-{
-    quad( 1, 0, 3, 2 );
-    quad( 2, 3, 7, 6 );
-    quad( 3, 0, 4, 7 );
-    quad( 6, 5, 1, 2 );
-    quad( 4, 5, 6, 7 );
-    quad( 5, 4, 0, 1 );
+/**
+ * Aðal lykkjan sem uppfærir ástand frumna á 900 millisekúndna fresti.
+ * Kallar á sjálfa sig endurtekið eftir hverja uppfærslu.
+ */
+function gameLoop() {
+    updateCellStates();
+    tween = 0;
+    setTimeout(function() {
+        gameLoop();
+    }, 900);
 }
 
-function quad(a, b, c, d) {
-    var vertices = [
-        vec3( -0.5, -0.5,  0.5 ),
-        vec3( -0.5,  0.5,  0.5 ),
-        vec3(  0.5,  0.5,  0.5 ),
-        vec3(  0.5, -0.5,  0.5 ),
-        vec3( -0.5, -0.5, -0.5 ),
-        vec3( -0.5,  0.5, -0.5 ),
-        vec3(  0.5,  0.5, -0.5 ),
-        vec3(  0.5, -0.5, -0.5 )
-    ];
-    
-    var vertexColors = [
-        [ 0.0, 0.0, 0.0, 1.0 ],  // black
-        [ 1.0, 0.0, 0.0, 1.0 ],  // red
-        [ 1.0, 1.0, 0.0, 1.0 ],  // yellow
-        [ 0.0, 1.0, 0.0, 1.0 ],  // green
-        [ 0.0, 0.0, 1.0, 1.0 ],  // blue
-        [ 1.0, 0.0, 1.0, 1.0 ],  // magenta
-        [ 0.0, 1.0, 1.0, 1.0 ],  // cyan
-        [ 1.0, 1.0, 1.0, 1.0 ]   // white
-    ];
-    
-    //vertex color assigned by the index of the vertex
-    var indices = [ a, b, c, a, c, d ];
-    
-    for ( var i = 0; i < indices.length; ++i ) {
-        points.push( vertices[indices[i]] );
-        colors.push(vertexColors[a]);
-        
-    }
-}
-
-function setupMouseControls() {
-    // Mouse event listeners for rotation
-    canvas.addEventListener("mousedown", function(e){
-        movement = true;
-        origX = e.offsetX;
-        origY = e.offsetY;
-        e.preventDefault();
-    });
-    
-    canvas.addEventListener("mouseup", function(e){
-        movement = false;
-    });
-    
-    canvas.addEventListener("mousemove", function(e){
-        if (movement) {
-            spinY = (spinY + (origX - e.offsetX)) % 360;
-            spinX = (spinX + (origY - e.offsetY)) % 360;
-            origX = e.offsetX;
-            origY = e.offsetY;
-        }
-    });
-    
-    canvas.addEventListener("wheel", function(e) {
-        // Prevent the default scrolling behavior
-        e.preventDefault();
-        
-        // Adjust zoom level based on scroll direction
-        zoom *= (e.deltaY < 0) ? 1.1 : 0.9; // Zoom in or out
-        zoom = Math.max(0.1, Math.min(zoom, 10)); // Limit zoom level
-    });
-}
-
+/**
+ * Teiknar grindina og teningana eftir núverandi ástandi.
+ * Kallar á requestAnimFrame til að halda áfram teikningunni í endurteknum ramma.
+ */
 function render() {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
