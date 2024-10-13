@@ -3,20 +3,17 @@ var gl;
 var vBuffer; // Declare vBuffer globally
 
 var gridSize = 10;
-
 var points = [];
 var colors = [];
-var numVertices = 36;
 
 var movement = false;     // Do we rotate?
 var spinX = 0;
 var spinY = 0;
 var origX;
 var origY;
-var zoom = 1.0; // Default zoom level
-var tween = 0.0;
-var cubes = []; // 3D array for cube states
-var prevCubes = []; // 3D array for previous cube states
+var zoom = 0.7; // Default zoom level
+var tween = 0.0; // Tween value for cube scaling
+var numVertices = 36;
 
 var matrixLoc;
 var cellStates = [];
@@ -32,15 +29,27 @@ window.onload = function init(){
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
     gl.enable(gl.DEPTH_TEST);
 
+    colorCube();
+
     var program = initShaders( gl, "vertex-shader", "fragment-shader" );
     gl.useProgram( program );
 
     // Initialize cell states
     initializeCellStates();
 
-    // Setup cube vertices and colors
-    createCubes();
+    // Initialize buffers (only once)
+    initializeBuffers(program);
 
+    // Mouse event listeners for rotation
+    setupMouseControls();
+
+    // Game loop - Update cell states every 800 ms
+    gameLoop();
+
+    render();
+}
+
+function initializeBuffers(program) {
     var cBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW );
@@ -58,41 +67,14 @@ window.onload = function init(){
     gl.enableVertexAttribArray( vPosition );
 
     matrixLoc = gl.getUniformLocation( program, "transform" );
+}
 
-    // Mouse event listeners for rotation
-    canvas.addEventListener("mousedown", function(e){
-        movement = true;
-        origX = e.offsetX;
-        origY = e.offsetY;
-        e.preventDefault();
-    });
-
-    canvas.addEventListener("mouseup", function(e){
-        movement = false;
-    });
-
-    canvas.addEventListener("mousemove", function(e){
-        if (movement) {
-            spinY = (spinY + (origX - e.offsetX)) % 360;
-            spinX = (spinX + (origY - e.offsetY)) % 360;
-            origX = e.offsetX;
-            origY = e.offsetY;
-        }
-    });
-
-    canvas.addEventListener("wheel", function(e) {
-        // Prevent the default scrolling behavior
-        e.preventDefault();
-    
-        // Adjust zoom level based on scroll direction
-        zoom *= (e.deltaY < 0) ? 1.1 : 0.9; // Zoom in or out
-        zoom = Math.max(0.1, Math.min(zoom, 10)); // Limit zoom level
-    });
-
-    // Game loop
-    setInterval(updateCellStates, 800); // Update cell states every 500 ms
-
-    render();
+function gameLoop() {
+    updateCellStates();
+    tween = 0;
+    setTimeout(function() {
+        gameLoop();
+    }, 900);
 }
 
 function initializeCellStates() {
@@ -104,66 +86,8 @@ function initializeCellStates() {
             cellStates[x][y] = [];
             nextCellStates[x][y] = [];
             for (var z = 0; z < gridSize; z++) {
-                cellStates[x][y][z] = Math.random() > 0.7 ? 1 : 0;
-                nextCellStates[x][y][z] = 0;
-            }
-        }
-    }
-}
-
-function createCube(position) {
-    var size = 0.045; // Size of the cube
-    var vertices = [
-        vec3(-size, -size, size),   // Front face
-        vec3(-size, size, size),
-        vec3(size, size, size),
-        vec3(size, -size, size),
-        vec3(-size, -size, -size),  // Back face
-        vec3(-size, size, -size),
-        vec3(size, size, -size),
-        vec3(size, -size, -size)
-    ];
-
-    // Define colors for each face
-    var faceColors = [
-        [1.0, 0.0, 0.0, 1.0], // Front face - Red
-        [0.0, 1.0, 0.0, 1.0], // Back face - Green
-        [0.0, 0.0, 1.0, 1.0], // Left face - Blue
-        [1.0, 1.0, 0.0, 1.0], // Right face - Yellow
-        [1.0, 0.0, 1.0, 1.0], // Top face - Magenta
-        [0.0, 1.0, 1.0, 1.0]  // Bottom face - Cyan
-    ];
-
-    var indices = [
-        1, 0, 3, 1, 3, 2, // Front face
-        5, 4, 7, 5, 7, 6, // Back face
-        4, 0, 1, 4, 1, 5, // Left face
-        6, 2, 3, 6, 3, 7, // Right face
-        1, 2, 6, 1, 6, 5, // Top face
-        0, 4, 7, 0, 7, 3  // Bottom face
-    ];
-
-    for (var i = 0; i < indices.length; ++i) {
-        points.push(add(vertices[indices[i]], position));
-        // Assign color based on the face index
-        colors.push(faceColors[Math.floor(i / 6)]); // 6 vertices per face
-    }
-}
-
-function createCubes() {
-    points = [];
-    colors = [];
-    var offset = gridSize / 2; // Original offset for centering the grid
-    var spacing = 0.1; // Set the spacing between cubes
-
-    for (var x = 0; x < gridSize; x++) {
-        for (var y = 0; y < gridSize; y++) {
-            for (var z = 0; z < gridSize; z++) {
-                if (cellStates[x][y][z] === 1) {
-                    createCube(
-                        vec3((x - offset) * spacing, (y - offset) * spacing, (z - offset) * spacing)
-                    );
-                }
+                nextCellStates[x][y][z] = Math.random() > 0.7 ? 1 : 0;
+                cellStates[x][y][z] = 0;
             }
         }
     }
@@ -179,6 +103,7 @@ function countNeighbors(x, y, z) {
                 var ny = y + dy;
                 var nz = z + dz;
                 if (
+                    // console.log(gridSize);
                     nx >= 0 && nx < gridSize &&
                     ny >= 0 && ny < gridSize &&
                     nz >= 0 && nz < gridSize
@@ -195,6 +120,14 @@ function updateCellStates() {
     for (var x = 0; x < gridSize; x++) {
         for (var y = 0; y < gridSize; y++) {
             for (var z = 0; z < gridSize; z++) {
+                cellStates[x][y][z] = nextCellStates[x][y][z];
+            }
+        }
+    }
+
+    for (var x = 0; x < gridSize; x++) {
+        for (var y = 0; y < gridSize; y++) {
+            for (var z = 0; z < gridSize; z++) {
                 var neighbors = countNeighbors(x, y, z);
                 if (cellStates[x][y][z] === 1) {
                     nextCellStates[x][y][z] = neighbors === 2 || neighbors === 3 ? 1 : 0;
@@ -205,16 +138,82 @@ function updateCellStates() {
         }
     }
     // Swap the current and next states
-    var temp = cellStates;
-    cellStates = nextCellStates;
-    nextCellStates = temp;
 
-    // Recreate the cubes based on the new states
-    createCubes();
+}
 
-    // Update buffer data
-    gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW);
+function colorCube()
+{
+    quad( 1, 0, 3, 2 );
+    quad( 2, 3, 7, 6 );
+    quad( 3, 0, 4, 7 );
+    quad( 6, 5, 1, 2 );
+    quad( 4, 5, 6, 7 );
+    quad( 5, 4, 0, 1 );
+}
+
+function quad(a, b, c, d) {
+    var vertices = [
+        vec3( -0.5, -0.5,  0.5 ),
+        vec3( -0.5,  0.5,  0.5 ),
+        vec3(  0.5,  0.5,  0.5 ),
+        vec3(  0.5, -0.5,  0.5 ),
+        vec3( -0.5, -0.5, -0.5 ),
+        vec3( -0.5,  0.5, -0.5 ),
+        vec3(  0.5,  0.5, -0.5 ),
+        vec3(  0.5, -0.5, -0.5 )
+    ];
+    
+    var vertexColors = [
+        [ 0.0, 0.0, 0.0, 1.0 ],  // black
+        [ 1.0, 0.0, 0.0, 1.0 ],  // red
+        [ 1.0, 1.0, 0.0, 1.0 ],  // yellow
+        [ 0.0, 1.0, 0.0, 1.0 ],  // green
+        [ 0.0, 0.0, 1.0, 1.0 ],  // blue
+        [ 1.0, 0.0, 1.0, 1.0 ],  // magenta
+        [ 0.0, 1.0, 1.0, 1.0 ],  // cyan
+        [ 1.0, 1.0, 1.0, 1.0 ]   // white
+    ];
+    
+    //vertex color assigned by the index of the vertex
+    var indices = [ a, b, c, a, c, d ];
+    
+    for ( var i = 0; i < indices.length; ++i ) {
+        points.push( vertices[indices[i]] );
+        colors.push(vertexColors[a]);
+        
+    }
+}
+
+function setupMouseControls() {
+    // Mouse event listeners for rotation
+    canvas.addEventListener("mousedown", function(e){
+        movement = true;
+        origX = e.offsetX;
+        origY = e.offsetY;
+        e.preventDefault();
+    });
+    
+    canvas.addEventListener("mouseup", function(e){
+        movement = false;
+    });
+    
+    canvas.addEventListener("mousemove", function(e){
+        if (movement) {
+            spinY = (spinY + (origX - e.offsetX)) % 360;
+            spinX = (spinX + (origY - e.offsetY)) % 360;
+            origX = e.offsetX;
+            origY = e.offsetY;
+        }
+    });
+    
+    canvas.addEventListener("wheel", function(e) {
+        // Prevent the default scrolling behavior
+        e.preventDefault();
+        
+        // Adjust zoom level based on scroll direction
+        zoom *= (e.deltaY < 0) ? 1.1 : 0.9; // Zoom in or out
+        zoom = Math.max(0.1, Math.min(zoom, 10)); // Limit zoom level
+    });
 }
 
 function render() {
@@ -225,8 +224,34 @@ function render() {
     mv = mult(mv, rotateX(spinX));
     mv = mult(mv, rotateY(spinY));
 
-    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv));
-    gl.drawArrays(gl.TRIANGLES, 0, points.length);
+    // Tween for smooth transitions (adjusting over time)
+    if (tween < 0.8) {
+        tween += 0.1;
+    }
 
-    requestAnimFrame(render);
+    mv = mult( mv, scalem( 0.2, 0.2, 0.2 ) );
+    mv = mult( mv, translate( -5, -5, -5 ) );
+
+    for (var i = 0; i < gridSize; i++) {
+        for (var j = 0; j < gridSize; j++) {
+            for (var k = 0; k < gridSize; k++) {
+                let mv1 = mult( mv, translate(i, j, k) );
+                if (nextCellStates[i][j][k] == 1) {
+                    if (nextCellStates[i][j][k] != cellStates[i][j][k]) {
+                        mv1 = mult( mv1, scalem( tween, tween, tween ) );
+                    } else {
+                        mv1 = mult( mv1, scalem( 0.9, 0.9, 0.9 ) );
+                    }
+                    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
+                    gl.drawArrays( gl.TRIANGLES, 0, numVertices);
+                } else if (nextCellStates[i][j][k] == 0 && cellStates[i][j][k] == 1 && tween < 0.89) {
+                    mv1 = mult( mv1, scalem( 1-tween, 1-tween, 1-tween ) );
+                    gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
+                    gl.drawArrays( gl.TRIANGLES, 0, points.length);
+                }
+                console.log(nextCellStates[i][j][k]);
+            }
+        }
+    }
+    requestAnimFrame(render); // Request the next frame
 }
