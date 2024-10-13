@@ -239,9 +239,9 @@ function updateCellStates() {
             for (var z = 0; z < gridSize; z++) {
                 var neighbors = countNeighbors(x, y, z);
                 if (cellStates[x][y][z] === 1) {
-                    nextCellStates[x][y][z] = neighbors === 2 || neighbors === 3 ? 1 : 0;
+                    nextCellStates[x][y][z] = (neighbors === 5 || neighbors === 6 || neighbors === 7) ? 1 : 0;
                 } else {
-                    nextCellStates[x][y][z] = neighbors === 3 ? 1 : 0;
+                    nextCellStates[x][y][z] = neighbors === 6 ? 1 : 0;
                 }
             }
         }
@@ -257,7 +257,7 @@ function gameLoop() {
     tween = 0;
     setTimeout(function() {
         gameLoop();
-    }, 900);
+    }, 2000);
 }
 
 /**
