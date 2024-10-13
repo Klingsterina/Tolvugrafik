@@ -18,6 +18,10 @@ body {
     
 }
 
+h1 {
+    text-align: center;
+}
+
 p:first-of-type {
     margin-right: 1rem;
 }
