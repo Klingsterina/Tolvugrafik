@@ -12,7 +12,7 @@ var spinY = 0;
 var origX;
 var origY;
 var zoom = 0.7; // Default zoom level
-var tween = 0.0; // Tween value for cube scaling
+var tween = 0.00; // Tween value for cube scaling
 var numVertices = 36;
 
 var matrixLoc;
@@ -273,8 +273,8 @@ function render() {
     mv = mult(mv, rotateY(spinY));
 
     // Tween for smooth transitions (adjusting over time)
-    if (tween < 0.8) {
-        tween += 0.1;
+    if(tween <= 0.9){
+        tween = tween + 0.02;
     }
 
     mv = mult( mv, scalem( 0.2, 0.2, 0.2 ) );
@@ -288,12 +288,12 @@ function render() {
                     if (nextCellStates[i][j][k] != cellStates[i][j][k]) {
                         mv1 = mult( mv1, scalem( tween, tween, tween ) );
                     } else {
-                        mv1 = mult( mv1, scalem( 0.9, 0.9, 0.9 ) );
+                        mv1 = mult( mv1, scalem( 0.89, 0.89, 0.89 ) );
                     }
                     gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
                     gl.drawArrays( gl.TRIANGLES, 0, numVertices);
-                } else if (nextCellStates[i][j][k] == 0 && cellStates[i][j][k] == 1 && tween < 0.89) {
-                    mv1 = mult( mv1, scalem( 1-tween, 1-tween, 1-tween ) );
+                } else if (nextCellStates[i][j][k] == 0 && cellStates[i][j][k] == 1 && tween < 0.9) {
+                    mv1 = mult( mv1, scalem( 0.9-tween, 0.9-tween, 0.9-tween ) );
                     gl.uniformMatrix4fv(matrixLoc, false, flatten(mv1));
                     gl.drawArrays( gl.TRIANGLES, 0, points.length);
                 }
