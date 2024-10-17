@@ -1,12 +1,3 @@
-/////////////////////////////////////////////////////////////////
-//    Sýnidæmi í Tölvugrafík
-//     Stigveldislíkan af fígúru.  Byggt á sýnidæmi úr kennslubók.
-//     Í þessari útgáfu eru líkamshlutar hreyfðir með örvalyklum
-//     og valið hvaða líkamshluta á að hreyfa með hnöppum.
-//     Nú með teningum með mislitum hliðum
-//
-//    Hjálmtýr Hafsteinsson, september 2024
-/////////////////////////////////////////////////////////////////
 var canvas;
 var gl;
 var program;
@@ -16,6 +7,8 @@ var spinX = 0;
 var spinY = 0;
 var origX;
 var origY;
+var animationSpeed = 8;
+var frame = 0;
 
 var zDist = -25.0;
 
@@ -125,7 +118,6 @@ function createNode(transform, render, sibling, child){
 function initNodes(Id) {
 
     var m = mat4();
-    
     switch(Id) {
     
     case torsoId:
@@ -148,7 +140,6 @@ function initNodes(Id) {
     
     
     case leftUpperArmId:
-    
     m = translate(-(torsoWidth+upperArmWidth), 0.9*torsoHeight, 0.0);
     m = mult(m, rotateX(theta[leftUpperArmId]));
     figure[leftUpperArmId] = createNode( m, leftUpperArm, rightUpperArmId, leftLowerArmId );
@@ -208,7 +199,6 @@ function initNodes(Id) {
 }
 
 function traverse(Id) {
-   
    if(Id == null) return; 
    stack.push(modelViewMatrix);
    modelViewMatrix = mult(modelViewMatrix, figure[Id].transform);
@@ -219,7 +209,6 @@ function traverse(Id) {
 }
 
 function torso() {
-
     instanceMatrix = mult(modelViewMatrix, translate(0.0, 0.5*torsoHeight, 0.0) );
     instanceMatrix = mult(instanceMatrix, scale4( torsoWidth, torsoHeight, torsoWidth));
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(instanceMatrix));
@@ -482,8 +471,25 @@ window.onload = function init() {
 
 
 var render = function() {
-
     gl.clear( gl.COLOR_BUFFER_BIT );
+
+    theta[leftUpperArmId] = 180.0 + (Math.sin(frame / animationSpeed) * 50);
+    initNodes(leftUpperArmId);
+
+    theta[rightUpperArmId] = 180.0 - (Math.sin(frame / animationSpeed)*50);
+    initNodes(rightUpperArmId);
+
+    theta[leftUpperLegId] = 10 - (Math.cos(frame / animationSpeed) * 60);
+    initNodes(leftUpperLegId);
+
+    theta[rightUpperLegId] = 10 + (Math.cos(frame / animationSpeed) * 60);
+    initNodes(rightUpperLegId);
+
+    // Calculate vertical offset
+    var verticalOffset = 0.1 * Math.sin(frame / 4); // Adjust 10 for speed
+    
+    // Update torso's position
+    figure[torsoId].transform = mult(translate(0, verticalOffset, 0), figure[torsoId].transform);
         
     // staðsetja áhorfanda og meðhöndla músarhreyfingu
     var mv = lookAt( vec3(0.0, 0.0, zDist), vec3(0.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0) );
@@ -492,5 +498,6 @@ var render = function() {
 
     modelViewMatrix = mv;
     traverse(torsoId);
+    frame++;
     requestAnimFrame(render);
 }
