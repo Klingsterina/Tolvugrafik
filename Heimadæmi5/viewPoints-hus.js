@@ -330,11 +330,12 @@ function render()
             // Distant and stationary viewpoint
             mv = lookAt(
                 vec3(250.0 * Math.sin(radians(rotationY)), 
-                      250.0 * Math.cos(radians(rotationY)), 
-                      100.0 + height + rotationX),
-                vec3(0.0, 0.0, 0.0), 
-                vec3(0.0, 0.0, 1.0)
-            );            drawScenery( mv );
+                    250.0 * Math.cos(radians(rotationY)), 
+                    100.0 + height + rotationX),
+                    vec3(0.0, 0.0, 0.0), 
+                    vec3(0.0, 0.0, 1.0)
+            );            
+            drawScenery( mv );
             mv = mult( mv, translate( carXPos, carYPos, 0.0 ) );
             mv = mult( mv, rotateZ( -carDirection ) ) ;
             drawCar( mv );

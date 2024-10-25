@@ -1,0 +1,77 @@
+<html>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+
+    attribute vec4 vPosition;
+    attribute vec4 vNormal;
+    varying vec3 N, L, E;
+    uniform mat4 modelViewMatrix;
+    uniform mat4 projectionMatrix;
+    uniform vec4 lightPosition;
+    uniform mat3 normalMatrix;
+    
+    void main()
+    {
+        vec3 pos = (modelViewMatrix * vPosition).xyz;
+    
+        // check for directional light
+        if(lightPosition.w == 0.0) L = normalize(lightPosition.xyz);
+        else L = normalize( lightPosition.xyz - pos );
+    
+        E =  -normalize(pos);
+        N = normalize( normalMatrix*vNormal.xyz);
+    
+        gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+    
+    }
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+    precision mediump float;
+
+    uniform vec4 ambientProduct;
+    uniform vec4 diffuseProduct;
+    uniform vec4 specularProduct;
+    uniform float shininess;
+    varying vec3 N, L, E;
+    
+    void main()
+    {
+        vec4 fColor;
+    
+        vec3 H = normalize( normalize(L) + normalize(E) );
+        vec4 ambient = ambientProduct;
+    
+        float Kd = max( dot(normalize(L), normalize(N)), 0.0 );
+        vec4  diffuse = Kd*diffuseProduct;
+    
+        float Ks = pow( max(dot(normalize(N), H), 0.0), shininess );
+        vec4  specular = Ks * specularProduct;
+    
+        if( dot(normalize(L), normalize(N)) < 0.0 ) specular = vec4(0.0, 0.0, 0.0, 1.0);
+    
+        fColor = ambient + diffuse +specular;
+        fColor.a = 1.0;
+    
+        gl_FragColor = fColor;
+    }
+</script>
+
+<script type="text/javascript" src="../Common/webgl-utils.js"></script>
+<script type="text/javascript" src="../Common/initShaders.js"></script>
+<script type="text/javascript" src="../Common/MV.js"></script>
+<script type="text/javascript" src="billy2.js"></script>
+
+<body>
+    <a href="../index.html">Til baka</a>
+<canvas id="gl-canvas" width="512" height="512"></canvas>
+<div>
+    <h2>Lýsing af verkefninu</h2>
+    <p>Skrifið WebGL forrit sem býr til bókaskápinn fræga BILLY. Hjá okkur er hann samsettur
+        úr 7 teningum (hliðarnar tvær, botninn, toppurinn, bakið og tvær hillur). Notið teninga
+        þar sem hver hlið hefur einn lit (sjá <a href="https://hjalmtyr.github.io/WebGL-forrit/Angel/cube-js.html">cube-js</a>). Notandinn á að geta snúið skrifborðinu
+        með músinni, svipað og í sýniforritinu <a href="https://hjalmtyr.github.io/WebGL-forrit/Angel/letterH.html">letterH</a>. Skilið skjámynd og hlekk á forritið.</p>
+</div>
+</body>
+</html>

@@ -485,10 +485,8 @@ var render = function() {
     theta[rightUpperLegId] = 10 + (Math.cos(frame / animationSpeed) * 60);
     initNodes(rightUpperLegId);
 
-    // Calculate vertical offset
+    // Láta kallinn færast upp og niður eins og hann sé að hlaupa
     var verticalOffset = 0.1 * Math.sin(frame / 4); // Adjust 10 for speed
-    
-    // Update torso's position
     figure[torsoId].transform = mult(translate(0, verticalOffset, 0), figure[torsoId].transform);
         
     // staðsetja áhorfanda og meðhöndla músarhreyfingu
