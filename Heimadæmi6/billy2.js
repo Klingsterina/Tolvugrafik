@@ -135,8 +135,7 @@ window.onload = function init(){
     render();
 }
 
-function normalCube()
-{
+function normalCube(){
     quad( 1, 0, 3, 2, 0 );
     quad( 2, 3, 7, 6, 1 );
     quad( 3, 0, 4, 7, 2 );
@@ -145,8 +144,7 @@ function normalCube()
     quad( 5, 4, 0, 1, 5 );
 }
 
-function quad(a, b, c, d, n) 
-{
+function quad(a, b, c, d, n) {
     var vertices = [
         vec4( -0.5, -0.5,  0.5, 1.0 ),
         vec4( -0.5,  0.5,  0.5, 1.0 ),
@@ -183,8 +181,7 @@ function quad(a, b, c, d, n)
 }
 
 
-function render()
-{
+function render() {
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     var mv = mat4();
