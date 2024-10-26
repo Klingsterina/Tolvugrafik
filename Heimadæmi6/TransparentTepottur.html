@@ -35,7 +35,7 @@
     uniform vec4 diffuseProduct;
     uniform vec4 specularProduct;
     uniform float shininess;
-    uniform float discardLevel;
+    uniform float discards;
     
     varying vec3 N, L, E;
     
@@ -55,7 +55,7 @@
         color.a = 1.0; // Alpha gildi
     
         // Lengdudreyfing
-        if(length(color.rgb) > discardLevel)
+        if(length(color.rgb) > discards)
             discard; // Henda píkslum sem eru yfir threshold
         else
             gl_FragColor = color; // Skila litnum

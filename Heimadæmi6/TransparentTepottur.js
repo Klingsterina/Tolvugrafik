@@ -12,8 +12,8 @@ var spinY = 0;
 var origX;
 var origY;
 
-var discardLevel = 1.8;
-var colorHue = 0;
+var discard = 1.8;
+var colorHue = 100;
 
 var zDist = -4.0;
 
@@ -108,14 +108,14 @@ window.onload = function init() {
     window.addEventListener("keydown", function (e) {
         switch (e.key) {
             case "ArrowUp":
-                discardLevel = Math.min(discardLevel + 0.1, 4.0); // Breytt til að hækka í 4.0
-                updateDiscardThreshold();
-                console.log("Discard Level:", discardLevel); // Skrifaðu út gildið
+                discard = Math.min(discard + 0.1, 4.0); // Breytt til að hækka í 4.0
+                updateDiscard();
+                console.log("Discard Level:", discard); // Skrifaðu út gildið
                 break;
             case "ArrowDown":
-                discardLevel = Math.max(discardLevel - 0.1, 0.0); // Breytt til að lækka í 0.0
-                updateDiscardThreshold();
-                console.log("Discard Level:", discardLevel); // Skrifaðu út gildið
+                discard = Math.max(discard - 0.1, 0.0); // Breytt til að lækka í 0.0
+                updateDiscard();
+                console.log("Discard Level:", discard); // Skrifaðu út gildið
                 break;
             case "ArrowLeft":
                 colorHue = (colorHue - 5 + 360) % 360;
@@ -161,13 +161,13 @@ window.onload = function init() {
     });
 
     setDiffuseColor(colorHue);
-    updateDiscardThreshold();
+    updateDiscard();
 
     render();
 }
 
-function updateDiscardThreshold() {
-    gl.uniform1f(gl.getUniformLocation(program, "discardLevel"), discardLevel);
+function updateDiscard() {
+    gl.uniform1f(gl.getUniformLocation(program, "discards"), discard);
 }
 
 function setDiffuseColor(colorHue) {
